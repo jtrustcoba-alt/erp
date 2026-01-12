@@ -4,6 +4,8 @@ import com.erp.core.entity.Company;
 import com.erp.core.entity.Org;
 import com.erp.core.model.BaseEntity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,10 +17,12 @@ import jakarta.persistence.Table;
 @Table(name = "md_warehouse")
 public class Warehouse extends BaseEntity {
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "org_id")
     private Org org;

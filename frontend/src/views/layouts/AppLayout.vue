@@ -20,6 +20,7 @@
             <el-menu-item index="/modules/masterdata/business-partners">Business Partners</el-menu-item>
             <el-menu-item index="/modules/masterdata/currencies">Currencies</el-menu-item>
             <el-menu-item index="/modules/masterdata/products">Products</el-menu-item>
+            <el-menu-item index="/modules/masterdata/warehouses">Warehouses</el-menu-item>
             <el-menu-item index="/modules/masterdata/price-lists">Price Lists</el-menu-item>
           </el-sub-menu>
 
@@ -33,7 +34,14 @@
             <el-menu-item index="/modules/sales/sales-orders">Sales Orders</el-menu-item>
           </el-sub-menu>
 
-          <el-menu-item index="/modules/inventory">Inventory</el-menu-item>
+          <el-sub-menu index="/modules/inventory">
+            <template #title>Inventory</template>
+            <el-menu-item index="/modules/masterdata/warehouses">Warehouses</el-menu-item>
+            <el-menu-item index="/modules/inventory/locators">Locators</el-menu-item>
+            <el-menu-item index="/modules/inventory/onhand">On-hand</el-menu-item>
+            <el-menu-item index="/modules/inventory/movements">Movements</el-menu-item>
+            <el-menu-item index="/modules/inventory/adjustments">Adjustments</el-menu-item>
+          </el-sub-menu>
           <el-menu-item index="/modules/manufacturing">Manufacturing</el-menu-item>
           <el-menu-item index="/modules/finance">Finance</el-menu-item>
           <el-menu-item index="/modules/hr">HR</el-menu-item>

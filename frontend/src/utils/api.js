@@ -38,6 +38,9 @@ export const masterDataApi = {
   listProducts: (companyId) => http.get(`/api/masterdata/companies/${companyId}/products`).then((r) => r.data),
   createProduct: (companyId, payload) => http.post(`/api/masterdata/companies/${companyId}/products`, payload).then((r) => r.data),
 
+  listWarehouses: (companyId) => http.get(`/api/masterdata/companies/${companyId}/warehouses`).then((r) => r.data),
+  createWarehouse: (companyId, payload) => http.post(`/api/masterdata/companies/${companyId}/warehouses`, payload).then((r) => r.data),
+
   listBusinessPartners: (companyId) => http.get(`/api/masterdata/companies/${companyId}/business-partners`).then((r) => r.data),
   createBusinessPartner: (companyId, payload) => http.post(`/api/masterdata/companies/${companyId}/business-partners`, payload).then((r) => r.data),
 
@@ -51,6 +54,22 @@ export const masterDataApi = {
     http.get(`/api/masterdata/price-list-versions/${priceListVersionId}/product-prices`).then((r) => r.data),
   upsertProductPrice: (priceListVersionId, payload) =>
     http.post(`/api/masterdata/price-list-versions/${priceListVersionId}/product-prices`, payload).then((r) => r.data)
+}
+
+export const inventoryApi = {
+  listLocators: (companyId, params) => http.get(`/api/inventory/companies/${companyId}/locators`, { params }).then((r) => r.data),
+  createLocator: (companyId, payload) => http.post(`/api/inventory/companies/${companyId}/locators`, payload).then((r) => r.data),
+
+  getOnHand: (companyId, params) => http.get(`/api/inventory/companies/${companyId}/onhand`, { params }).then((r) => r.data),
+
+  listMovements: (companyId) => http.get(`/api/inventory/companies/${companyId}/movements`).then((r) => r.data),
+  createMovement: (companyId, payload) => http.post(`/api/inventory/companies/${companyId}/movements`, payload).then((r) => r.data),
+
+  listAdjustments: (companyId) => http.get(`/api/inventory/companies/${companyId}/adjustments`).then((r) => r.data),
+  createAdjustment: (companyId, payload) => http.post(`/api/inventory/companies/${companyId}/adjustments`, payload).then((r) => r.data),
+  completeAdjustment: (companyId, adjustmentId) =>
+    http.post(`/api/inventory/companies/${companyId}/adjustments/${adjustmentId}/complete`).then((r) => r.data),
+  voidAdjustment: (companyId, adjustmentId) => http.post(`/api/inventory/companies/${companyId}/adjustments/${adjustmentId}/void`).then((r) => r.data)
 }
 
 export const purchaseApi = {

@@ -20,6 +20,7 @@ export const modules = [
       { title: 'Business Partners', description: 'Customer/Vendor', to: '/modules/masterdata/business-partners' },
       { title: 'Currencies', description: 'Mata uang untuk price list', to: '/modules/masterdata/currencies' },
       { title: 'Products', description: 'Buat produk untuk transaksi', to: '/modules/masterdata/products' },
+      { title: 'Warehouses', description: 'Gudang untuk inventory', to: '/modules/masterdata/warehouses' },
       { title: 'Price Lists', description: 'Price list dan version', to: '/modules/masterdata/price-lists' }
     ],
     match: ['/api/masterdata/']
@@ -49,7 +50,13 @@ export const modules = [
     title: 'Inventory',
     description: 'Manajemen stok: on-hand, locator, movement, adjustment.',
     flow: ['Setup Locator', 'Check On-hand', 'Inventory Movement', 'Inventory Adjustment (Complete/Void)'],
-    pages: [],
+    pages: [
+      { title: 'Warehouses', description: 'Gudang untuk stok', to: '/modules/masterdata/warehouses' },
+      { title: 'Locators', description: 'Rak/lokasi per warehouse', to: '/modules/inventory/locators' },
+      { title: 'On-hand', description: 'Cek stok per locator & product', to: '/modules/inventory/onhand' },
+      { title: 'Movements', description: 'IN/OUT/TRANSFER stok', to: '/modules/inventory/movements' },
+      { title: 'Adjustments', description: 'Stock opname + jurnal', to: '/modules/inventory/adjustments' }
+    ],
     match: ['/api/inventory/']
   },
   {

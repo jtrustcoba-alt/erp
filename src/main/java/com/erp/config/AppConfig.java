@@ -34,7 +34,7 @@ public class AppConfig {
                 // Role-based access control for your ERP project
                 .requestMatchers("/api/finance/**").hasRole("FINANCE") // Only Finance role can access finance-related APIs
                 .requestMatchers("/api/hr/**").hasRole("HR") // Only HR role can access HR-related APIs
-                .requestMatchers("/api/inventory/**").hasRole("INVENTORY") // Only Inventory role can access inventory-related APIs
+                .requestMatchers("/api/inventory/**").hasAnyRole("INVENTORY", "ADMIN") // Allow Inventory role and Admin to access inventory APIs
                 .requestMatchers("/api/admin/**").hasRole("ADMIN") // Only Admin can access admin-related APIs
                 .requestMatchers("/api/**").authenticated() // All authenticated users can access these APIs
                 .requestMatchers("/api/employee/**").hasRole("EMPLOYEE")

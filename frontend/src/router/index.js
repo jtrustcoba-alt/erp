@@ -14,8 +14,13 @@ import BusinessPartnersView from '@/views/modules/masterdata/BusinessPartnersVie
 import CurrenciesView from '@/views/modules/masterdata/CurrenciesView.vue'
 import ProductsView from '@/views/modules/masterdata/ProductsView.vue'
 import PriceListsView from '@/views/modules/masterdata/PriceListsView.vue'
+import WarehousesView from '@/views/modules/masterdata/WarehousesView.vue'
 import PurchaseOrdersView from '@/views/modules/purchase/PurchaseOrdersView.vue'
 import SalesOrdersView from '@/views/modules/sales/SalesOrdersView.vue'
+import LocatorsView from '@/views/modules/inventory/LocatorsView.vue'
+import OnHandView from '@/views/modules/inventory/OnHandView.vue'
+import MovementsView from '@/views/modules/inventory/MovementsView.vue'
+import AdjustmentsView from '@/views/modules/inventory/AdjustmentsView.vue'
 import ApiExplorerView from '@/views/tools/ApiExplorerView.vue'
 
 const router = createRouter({
@@ -39,8 +44,13 @@ const router = createRouter({
         { path: 'modules/masterdata/currencies', name: 'md-currencies', component: CurrenciesView },
         { path: 'modules/masterdata/products', name: 'md-products', component: ProductsView },
         { path: 'modules/masterdata/price-lists', name: 'md-price-lists', component: PriceListsView },
+        { path: 'modules/masterdata/warehouses', name: 'md-warehouses', component: WarehousesView },
         { path: 'modules/purchase/purchase-orders', name: 'purchase-orders', component: PurchaseOrdersView },
         { path: 'modules/sales/sales-orders', name: 'sales-orders', component: SalesOrdersView },
+        { path: 'modules/inventory/locators', name: 'inv-locators', component: LocatorsView },
+        { path: 'modules/inventory/onhand', name: 'inv-onhand', component: OnHandView },
+        { path: 'modules/inventory/movements', name: 'inv-movements', component: MovementsView },
+        { path: 'modules/inventory/adjustments', name: 'inv-adjustments', component: AdjustmentsView },
         { path: 'tools/api-explorer', name: 'api-explorer', component: ApiExplorerView }
       ]
     }
