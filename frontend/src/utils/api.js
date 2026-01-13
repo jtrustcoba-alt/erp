@@ -90,7 +90,11 @@ export const inventoryApi = {
 
 export const purchaseApi = {
   listPurchaseOrders: (companyId) => http.get(`/api/purchase/companies/${companyId}/purchase-orders`).then((r) => r.data),
-  createPurchaseOrder: (companyId, payload) => http.post(`/api/purchase/companies/${companyId}/purchase-orders`, payload).then((r) => r.data)
+  createPurchaseOrder: (companyId, payload) => http.post(`/api/purchase/companies/${companyId}/purchase-orders`, payload).then((r) => r.data),
+  updatePurchaseOrder: (companyId, purchaseOrderId, payload) =>
+    http.put(`/api/purchase/companies/${companyId}/purchase-orders/${purchaseOrderId}`, payload).then((r) => r.data),
+  deletePurchaseOrder: (companyId, purchaseOrderId) =>
+    http.delete(`/api/purchase/companies/${companyId}/purchase-orders/${purchaseOrderId}`).then((r) => r.data)
 }
 
 export const salesApi = {

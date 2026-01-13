@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.erp.core.entity.Company;
 import com.erp.core.entity.Org;
+import com.erp.core.model.DocumentStatus;
 import com.erp.core.model.DocumentType;
 import com.erp.core.repository.CompanyRepository;
 import com.erp.core.repository.OrgRepository;
@@ -25,6 +26,7 @@ import com.erp.purchase.entity.PurchaseOrder;
 import com.erp.purchase.entity.PurchaseOrderLine;
 import com.erp.purchase.repository.PurchaseOrderRepository;
 import com.erp.purchase.request.CreatePurchaseOrderRequest;
+import com.erp.purchase.request.UpdatePurchaseOrderRequest;
 
 @Service
 public class PurchaseOrderService {
@@ -119,5 +121,80 @@ public class PurchaseOrderService {
         po.setGrandTotal(totalNet);
 
         return purchaseOrderRepository.save(po);
+    }
+
+    @Transactional
+    public PurchaseOrder update(Long companyId, Long purchaseOrderId, UpdatePurchaseOrderRequest request) {
+        PurchaseOrder po = purchaseOrderRepository.findById(purchaseOrderId)
+                .orElseThrow(() -> new IllegalArgumentException("Purchase Order not found"));
+        if (po.getCompany() == null || po.getCompany().getId() == null || !po.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Purchase Order company mismatch");
+        }
+        if (po.getStatus() != DocumentStatus.DRAFTED) {
+            throw new IllegalArgumentException("Only DRAFTED Purchase Order can be updated");
+        }
+
+        Org org = null;
+        if (request.getOrgId() != null) {
+            org = orgRepository.findById(request.getOrgId())
+                    .orElseThrow(() -> new IllegalArgumentException("Org not found"));
+        }
+
+        BusinessPartner vendor = businessPartnerRepository.findById(request.getVendorId())
+                .orElseThrow(() -> new IllegalArgumentException("Vendor not found"));
+
+        PriceListVersion plv = priceListVersionRepository.findById(request.getPriceListVersionId())
+                .orElseThrow(() -> new IllegalArgumentException("PriceListVersion not found"));
+
+        po.setOrg(org);
+        po.setVendor(vendor);
+        po.setPriceListVersion(plv);
+        po.setOrderDate(request.getOrderDate());
+
+        po.getLines().clear();
+        BigDecimal totalNet = BigDecimal.ZERO;
+
+        for (UpdatePurchaseOrderRequest.UpdatePurchaseOrderLineRequest lineReq : request.getLines()) {
+            Product product = productRepository.findById(lineReq.getProductId())
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+            ProductPrice productPrice = productPriceRepository
+                    .findByPriceListVersion_IdAndProduct_Id(plv.getId(), product.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Product price not found for productId=" + product.getId()));
+
+            BigDecimal qty = lineReq.getQty();
+            BigDecimal price = productPrice.getPrice();
+            BigDecimal lineNet = price.multiply(qty);
+
+            PurchaseOrderLine pol = new PurchaseOrderLine();
+            pol.setPurchaseOrder(po);
+            pol.setProduct(product);
+            pol.setUom(product.getUom());
+            pol.setQty(qty);
+            pol.setPrice(price);
+            pol.setLineNet(lineNet);
+
+            po.getLines().add(pol);
+            totalNet = totalNet.add(lineNet);
+        }
+
+        po.setTotalNet(totalNet);
+        po.setTotalTax(BigDecimal.ZERO);
+        po.setGrandTotal(totalNet);
+
+        return purchaseOrderRepository.save(po);
+    }
+
+    @Transactional
+    public void delete(Long companyId, Long purchaseOrderId) {
+        PurchaseOrder po = purchaseOrderRepository.findById(purchaseOrderId)
+                .orElseThrow(() -> new IllegalArgumentException("Purchase Order not found"));
+        if (po.getCompany() == null || po.getCompany().getId() == null || !po.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Purchase Order company mismatch");
+        }
+        if (po.getStatus() != DocumentStatus.DRAFTED) {
+            throw new IllegalArgumentException("Only DRAFTED Purchase Order can be deleted");
+        }
+        purchaseOrderRepository.delete(po);
     }
 }

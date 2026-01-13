@@ -33,6 +33,16 @@ public class WarehouseService {
     public Warehouse create(Long companyId, Long orgId, Warehouse warehouse) {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new IllegalArgumentException("Company not found"));
+
+        String code = warehouse.getCode() != null ? warehouse.getCode().trim() : null;
+        warehouse.setCode(code);
+        if (code == null || code.isBlank()) {
+            throw new IllegalArgumentException("Code is required");
+        }
+        if (warehouseRepository.existsByCompanyIdAndCodeIgnoreCase(companyId, code)) {
+            throw new IllegalArgumentException("Warehouse code already exists: " + code);
+        }
+
         warehouse.setCompany(company);
 
         if (orgId != null) {
@@ -52,7 +62,15 @@ public class WarehouseService {
             throw new IllegalArgumentException("Warehouse company mismatch");
         }
 
-        existing.setCode(patch.getCode());
+        String code = patch.getCode() != null ? patch.getCode().trim() : null;
+        if (code == null || code.isBlank()) {
+            throw new IllegalArgumentException("Code is required");
+        }
+        if (warehouseRepository.existsByCompanyIdAndCodeIgnoreCaseAndIdNot(companyId, code, existing.getId())) {
+            throw new IllegalArgumentException("Warehouse code already exists: " + code);
+        }
+
+        existing.setCode(code);
         existing.setName(patch.getName());
         existing.setActive(patch.isActive());
 

@@ -36,6 +36,15 @@ public class ProductService {
         Uom uom = uomRepository.findById(uomId)
                 .orElseThrow(() -> new IllegalArgumentException("UOM not found"));
 
+        String code = product.getCode() != null ? product.getCode().trim() : null;
+        product.setCode(code);
+        if (code == null || code.isBlank()) {
+            throw new IllegalArgumentException("Code is required");
+        }
+        if (productRepository.existsByCompanyIdAndCodeIgnoreCase(companyId, code)) {
+            throw new IllegalArgumentException("Product code already exists: " + code);
+        }
+
         product.setCompany(company);
         product.setUom(uom);
 
@@ -53,7 +62,15 @@ public class ProductService {
         Uom uom = uomRepository.findById(uomId)
                 .orElseThrow(() -> new IllegalArgumentException("UOM not found"));
 
-        existing.setCode(patch.getCode());
+        String code = patch.getCode() != null ? patch.getCode().trim() : null;
+        if (code == null || code.isBlank()) {
+            throw new IllegalArgumentException("Code is required");
+        }
+        if (productRepository.existsByCompanyIdAndCodeIgnoreCaseAndIdNot(companyId, code, existing.getId())) {
+            throw new IllegalArgumentException("Product code already exists: " + code);
+        }
+
+        existing.setCode(code);
         existing.setName(patch.getName());
         existing.setUom(uom);
         existing.setActive(patch.isActive());

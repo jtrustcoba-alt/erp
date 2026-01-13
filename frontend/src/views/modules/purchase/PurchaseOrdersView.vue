@@ -22,10 +22,16 @@
         <el-table-column prop="status" label="Status" width="140" />
         <el-table-column prop="orderDate" label="Order Date" width="140" />
         <el-table-column prop="grandTotal" label="Grand Total" width="140" />
+        <el-table-column label="Action" width="180">
+          <template #default="scope">
+            <el-button size="small" @click="openEdit(scope.row)" :disabled="!canEditRow(scope.row)">Edit</el-button>
+            <el-button type="danger" size="small" plain @click="onDelete(scope.row)" :disabled="!canEditRow(scope.row)">Delete</el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
 
-    <el-dialog v-model="createOpen" title="Create Purchase Order" width="860px">
+    <el-dialog v-model="createOpen" :title="dialogTitle" width="860px">
       <el-form label-position="top">
         <el-alert
           v-if="ctx.companyId && (priceLists.length === 0 || priceListVersions.length === 0 || !form.priceListVersionId)"
@@ -102,7 +108,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { masterDataApi, purchaseApi } from '@/utils/api'
 import { useContextStore } from '@/stores/context'
 import CompanyOrgBar from '@/views/modules/common/CompanyOrgBar.vue'
@@ -120,6 +126,11 @@ const productPrices = ref([])
 
 const createOpen = ref(false)
 const saving = ref(false)
+
+const editMode = ref('create')
+const editingId = ref(null)
+
+const dialogTitle = computed(() => (editMode.value === 'edit' ? 'Edit Purchase Order' : 'Create Purchase Order'))
 
 const form = reactive({
   orgId: null,
@@ -205,6 +216,8 @@ async function load() {
 }
 
 function openCreate() {
+  editMode.value = 'create'
+  editingId.value = null
   form.orgId = ctx.orgId
   form.vendorId = vendors.value[0]?.id || null
   form.priceListVersionId = priceListVersions.value[0]?.id || null
@@ -212,6 +225,29 @@ function openCreate() {
   form.lines = []
   addLine()
   createOpen.value = true
+}
+
+async function openEdit(row) {
+  if (!row?.id) return
+  editMode.value = 'edit'
+  editingId.value = row.id
+
+  form.orgId = row.orgId || null
+  form.vendorId = row.vendorId || null
+  form.priceListVersionId = row.priceListVersionId || null
+  form.orderDate = row.orderDate || new Date().toISOString().slice(0, 10)
+  form.lines = (row.lines || []).map((l) => ({
+    productId: l.productId,
+    qty: String(l.qty ?? '')
+  }))
+  if (form.lines.length === 0) addLine()
+
+  productPrices.value = form.priceListVersionId ? await masterDataApi.listProductPrices(form.priceListVersionId) : []
+  createOpen.value = true
+}
+
+function canEditRow(row) {
+  return !!ctx.companyId && row?.status === 'DRAFTED'
 }
 
 watch(
@@ -226,7 +262,7 @@ async function save() {
   saving.value = true
   try {
     const payload = {
-      orgId: ctx.orgId || null,
+      orgId: form.orgId || null,
       vendorId: form.vendorId,
       priceListVersionId: form.priceListVersionId,
       orderDate: form.orderDate,
@@ -236,14 +272,36 @@ async function save() {
       }))
     }
 
-    await purchaseApi.createPurchaseOrder(ctx.companyId, payload)
-    ElMessage.success('Purchase Order created')
+    if (editMode.value === 'edit' && editingId.value) {
+      await purchaseApi.updatePurchaseOrder(ctx.companyId, editingId.value, payload)
+      ElMessage.success('Purchase Order updated')
+    } else {
+      await purchaseApi.createPurchaseOrder(ctx.companyId, payload)
+      ElMessage.success('Purchase Order created')
+    }
     createOpen.value = false
     await load()
   } catch (e) {
     ElMessage.error(e?.response?.data?.message || e?.message || 'Failed')
   } finally {
     saving.value = false
+  }
+}
+
+async function onDelete(row) {
+  if (!row?.id) return
+  try {
+    await ElMessageBox.confirm(`Delete Purchase Order "${row.documentNo}"?`, 'Confirm', {
+      type: 'warning',
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel'
+    })
+    await purchaseApi.deletePurchaseOrder(ctx.companyId, row.id)
+    ElMessage.success('Purchase Order deleted')
+    await load()
+  } catch (e) {
+    if (e === 'cancel' || e === 'close') return
+    ElMessage.error(e?.response?.data?.message || e?.message || 'Failed')
   }
 }
 

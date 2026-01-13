@@ -29,6 +29,16 @@ public class UomService {
     public Uom create(Long companyId, Uom uom) {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new IllegalArgumentException("Company not found"));
+
+        String code = uom.getCode() != null ? uom.getCode().trim() : null;
+        uom.setCode(code);
+        if (code == null || code.isBlank()) {
+            throw new IllegalArgumentException("Code is required");
+        }
+        if (uomRepository.existsByCompanyIdAndCodeIgnoreCase(companyId, code)) {
+            throw new IllegalArgumentException("UoM code already exists: " + code);
+        }
+
         uom.setCompany(company);
         return uomRepository.save(uom);
     }
@@ -41,7 +51,15 @@ public class UomService {
             throw new IllegalArgumentException("UoM company mismatch");
         }
 
-        existing.setCode(patch.getCode());
+        String code = patch.getCode() != null ? patch.getCode().trim() : null;
+        if (code == null || code.isBlank()) {
+            throw new IllegalArgumentException("Code is required");
+        }
+        if (uomRepository.existsByCompanyIdAndCodeIgnoreCaseAndIdNot(companyId, code, existing.getId())) {
+            throw new IllegalArgumentException("UoM code already exists: " + code);
+        }
+
+        existing.setCode(code);
         existing.setName(patch.getName());
         existing.setActive(patch.isActive());
         return uomRepository.save(existing);

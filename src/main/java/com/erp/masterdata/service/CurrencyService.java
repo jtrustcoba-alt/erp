@@ -29,6 +29,16 @@ public class CurrencyService {
     public Currency create(Long companyId, Currency currency) {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new IllegalArgumentException("Company not found"));
+
+        String code = currency.getCode() != null ? currency.getCode().trim() : null;
+        currency.setCode(code);
+        if (code == null || code.isBlank()) {
+            throw new IllegalArgumentException("Code is required");
+        }
+        if (currencyRepository.existsByCompanyIdAndCodeIgnoreCase(companyId, code)) {
+            throw new IllegalArgumentException("Currency code already exists: " + code);
+        }
+
         currency.setCompany(company);
         return currencyRepository.save(currency);
     }
@@ -41,7 +51,15 @@ public class CurrencyService {
             throw new IllegalArgumentException("Currency company mismatch");
         }
 
-        existing.setCode(patch.getCode());
+        String code = patch.getCode() != null ? patch.getCode().trim() : null;
+        if (code == null || code.isBlank()) {
+            throw new IllegalArgumentException("Code is required");
+        }
+        if (currencyRepository.existsByCompanyIdAndCodeIgnoreCaseAndIdNot(companyId, code, existing.getId())) {
+            throw new IllegalArgumentException("Currency code already exists: " + code);
+        }
+
+        existing.setCode(code);
         existing.setName(patch.getName());
         existing.setPrecisionValue(patch.getPrecisionValue());
         existing.setActive(patch.isActive());

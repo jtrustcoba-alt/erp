@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +18,7 @@ import com.erp.purchase.dto.PurchaseOrderLineDto;
 import com.erp.purchase.entity.PurchaseOrder;
 import com.erp.purchase.entity.PurchaseOrderLine;
 import com.erp.purchase.request.CreatePurchaseOrderRequest;
+import com.erp.purchase.request.UpdatePurchaseOrderRequest;
 import com.erp.purchase.service.PurchaseOrderService;
 
 import jakarta.validation.Valid;
@@ -40,6 +43,21 @@ public class PurchaseOrderController {
     public ResponseEntity<PurchaseOrderDto> create(@PathVariable Long companyId, @Valid @RequestBody CreatePurchaseOrderRequest request) {
         PurchaseOrder saved = purchaseOrderService.create(companyId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(saved));
+    }
+
+    @PutMapping("/{purchaseOrderId}")
+    public ResponseEntity<PurchaseOrderDto> update(
+            @PathVariable Long companyId,
+            @PathVariable Long purchaseOrderId,
+            @Valid @RequestBody UpdatePurchaseOrderRequest request) {
+        PurchaseOrder updated = purchaseOrderService.update(companyId, purchaseOrderId, request);
+        return ResponseEntity.ok(toDto(updated));
+    }
+
+    @DeleteMapping("/{purchaseOrderId}")
+    public ResponseEntity<Void> delete(@PathVariable Long companyId, @PathVariable Long purchaseOrderId) {
+        purchaseOrderService.delete(companyId, purchaseOrderId);
+        return ResponseEntity.noContent().build();
     }
 
     private PurchaseOrderDto toDto(PurchaseOrder po) {
