@@ -109,11 +109,17 @@ export const manufacturingApi = {
   listBoms: (companyId) => http.get(`/api/manufacturing/companies/${companyId}/boms`).then((r) => r.data),
   getBom: (companyId, bomId) => http.get(`/api/manufacturing/companies/${companyId}/boms/${bomId}`).then((r) => r.data),
   createBom: (companyId, payload) => http.post(`/api/manufacturing/companies/${companyId}/boms`, payload).then((r) => r.data),
+  updateBom: (companyId, bomId, payload) => http.put(`/api/manufacturing/companies/${companyId}/boms/${bomId}`, payload).then((r) => r.data),
+  deleteBom: (companyId, bomId) => http.delete(`/api/manufacturing/companies/${companyId}/boms/${bomId}`).then((r) => r.data),
 
   listWorkOrders: (companyId) => http.get(`/api/manufacturing/companies/${companyId}/work-orders`).then((r) => r.data),
   getWorkOrder: (companyId, workOrderId) =>
     http.get(`/api/manufacturing/companies/${companyId}/work-orders/${workOrderId}`).then((r) => r.data),
   createWorkOrder: (companyId, payload) => http.post(`/api/manufacturing/companies/${companyId}/work-orders`, payload).then((r) => r.data),
+  updateWorkOrder: (companyId, workOrderId, payload) =>
+    http.put(`/api/manufacturing/companies/${companyId}/work-orders/${workOrderId}`, payload).then((r) => r.data),
+  deleteWorkOrder: (companyId, workOrderId) =>
+    http.delete(`/api/manufacturing/companies/${companyId}/work-orders/${workOrderId}`).then((r) => r.data),
   completeWorkOrder: (companyId, workOrderId, payload) =>
     http.post(`/api/manufacturing/companies/${companyId}/work-orders/${workOrderId}/complete`, payload).then((r) => r.data),
   voidWorkOrder: (companyId, workOrderId, payload) =>

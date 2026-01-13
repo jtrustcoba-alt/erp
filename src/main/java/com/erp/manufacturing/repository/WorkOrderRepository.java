@@ -11,4 +11,6 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
     List<WorkOrder> findByCompanyId(Long companyId);
 
     List<WorkOrder> findByCompanyIdAndStatusNot(Long companyId, DocumentStatus status);
+
+    boolean existsByBom_Id(Long bomId);
 }

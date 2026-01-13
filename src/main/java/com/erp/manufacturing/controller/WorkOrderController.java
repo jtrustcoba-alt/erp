@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +17,7 @@ import com.erp.manufacturing.dto.WorkOrderDto;
 import com.erp.manufacturing.entity.WorkOrder;
 import com.erp.manufacturing.request.CompleteWorkOrderRequest;
 import com.erp.manufacturing.request.CreateWorkOrderRequest;
+import com.erp.manufacturing.request.UpdateWorkOrderRequest;
 import com.erp.manufacturing.request.VoidWorkOrderRequest;
 import com.erp.manufacturing.service.WorkOrderService;
 
@@ -44,6 +47,21 @@ public class WorkOrderController {
     public ResponseEntity<WorkOrderDto> create(@PathVariable Long companyId, @Valid @RequestBody CreateWorkOrderRequest request) {
         WorkOrder saved = workOrderService.create(companyId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(saved));
+    }
+
+    @PutMapping("/{workOrderId}")
+    public ResponseEntity<WorkOrderDto> update(
+            @PathVariable Long companyId,
+            @PathVariable Long workOrderId,
+            @Valid @RequestBody UpdateWorkOrderRequest request) {
+        WorkOrder updated = workOrderService.update(companyId, workOrderId, request);
+        return ResponseEntity.ok(toDto(updated));
+    }
+
+    @DeleteMapping("/{workOrderId}")
+    public ResponseEntity<Void> delete(@PathVariable Long companyId, @PathVariable Long workOrderId) {
+        workOrderService.delete(companyId, workOrderId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{workOrderId}/complete")

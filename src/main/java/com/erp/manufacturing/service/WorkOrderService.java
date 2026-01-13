@@ -26,6 +26,7 @@ import com.erp.manufacturing.repository.BomRepository;
 import com.erp.manufacturing.repository.WorkOrderRepository;
 import com.erp.manufacturing.request.CompleteWorkOrderRequest;
 import com.erp.manufacturing.request.CreateWorkOrderRequest;
+import com.erp.manufacturing.request.UpdateWorkOrderRequest;
 import com.erp.manufacturing.request.VoidWorkOrderRequest;
 
 @Service
@@ -108,6 +109,58 @@ public class WorkOrderService {
         wo.setStatus(DocumentStatus.DRAFTED);
 
         return workOrderRepository.save(wo);
+    }
+
+    @Transactional
+    public WorkOrder update(Long companyId, Long workOrderId, UpdateWorkOrderRequest request) {
+        WorkOrder wo = get(companyId, workOrderId);
+
+        if (wo.getStatus() != DocumentStatus.DRAFTED) {
+            throw new IllegalArgumentException("Only DRAFTED Work Order can be updated");
+        }
+
+        Org org = null;
+        if (request.getOrgId() != null) {
+            org = orgRepository.findById(request.getOrgId())
+                    .orElseThrow(() -> new IllegalArgumentException("Org not found"));
+        }
+
+        if (request.getQty() == null || request.getQty().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Qty must be > 0");
+        }
+
+        Bom bom = bomRepository.findById(request.getBomId())
+                .orElseThrow(() -> new IllegalArgumentException("BOM not found"));
+
+        if (bom.getCompany() == null || bom.getCompany().getId() == null || !bom.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("BOM company mismatch");
+        }
+
+        if (!bom.isActive()) {
+            throw new IllegalArgumentException("BOM is not active");
+        }
+
+        wo.setOrg(org);
+        wo.setWorkDate(request.getWorkDate());
+        wo.setBom(bom);
+        wo.setProduct(bom.getProduct());
+        wo.setQty(request.getQty());
+        wo.setFromLocator(findLocator(companyId, request.getFromLocatorId(), "From locator not found"));
+        wo.setToLocator(findLocator(companyId, request.getToLocatorId(), "To locator not found"));
+        wo.setDescription(request.getDescription());
+
+        return workOrderRepository.save(wo);
+    }
+
+    @Transactional
+    public void delete(Long companyId, Long workOrderId) {
+        WorkOrder wo = get(companyId, workOrderId);
+
+        if (wo.getStatus() != DocumentStatus.DRAFTED) {
+            throw new IllegalArgumentException("Only DRAFTED Work Order can be deleted");
+        }
+
+        workOrderRepository.delete(wo);
     }
 
     @Transactional

@@ -35,10 +35,16 @@
             <span>{{ (scope.row.lines || []).length }}</span>
           </template>
         </el-table-column>
+        <el-table-column label="Action" width="180">
+          <template #default="scope">
+            <el-button size="small" @click="openEdit(scope.row)" :disabled="!ctx.companyId">Edit</el-button>
+            <el-button type="danger" size="small" plain @click="onDelete(scope.row)" :disabled="!ctx.companyId">Delete</el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
 
-    <el-dialog v-model="createOpen" title="Create BOM" width="980px">
+    <el-dialog v-model="createOpen" :title="dialogTitle" width="980px">
       <el-form label-position="top">
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px">
           <el-form-item label="Finished Product">
@@ -96,7 +102,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { manufacturingApi, masterDataApi } from '@/utils/api'
 import { useContextStore } from '@/stores/context'
 import CompanyOrgBar from '@/views/modules/common/CompanyOrgBar.vue'
@@ -110,6 +116,11 @@ const products = ref([])
 
 const createOpen = ref(false)
 const saving = ref(false)
+
+const editMode = ref('create')
+const editingId = ref(null)
+
+const dialogTitle = computed(() => (editMode.value === 'edit' ? 'Edit BOM' : 'Create BOM'))
 
 const form = reactive({
   orgId: null,
@@ -174,6 +185,8 @@ async function load() {
 }
 
 function openCreate() {
+  editMode.value = 'create'
+  editingId.value = null
   form.orgId = ctx.orgId
   form.productId = products.value[0]?.id || null
   form.version = '1'
@@ -183,11 +196,27 @@ function openCreate() {
   createOpen.value = true
 }
 
+function openEdit(row) {
+  if (!row?.id) return
+  editMode.value = 'edit'
+  editingId.value = row.id
+  form.orgId = row.orgId || null
+  form.productId = row.productId || null
+  form.version = String(row.version ?? '1')
+  form.active = !!row.active
+  form.lines = (row.lines || []).map((l) => ({
+    componentProductId: l.componentProductId,
+    qty: String(l.qty ?? '')
+  }))
+  if (form.lines.length === 0) addLine()
+  createOpen.value = true
+}
+
 async function save() {
   saving.value = true
   try {
-    await manufacturingApi.createBom(ctx.companyId, {
-      orgId: ctx.orgId || null,
+    const payload = {
+      orgId: form.orgId || null,
       productId: form.productId,
       version: Number(form.version),
       active: !!form.active,
@@ -195,14 +224,38 @@ async function save() {
         componentProductId: l.componentProductId,
         qty: l.qty
       }))
-    })
-    ElMessage.success('BOM created')
+    }
+
+    if (editMode.value === 'edit' && editingId.value) {
+      await manufacturingApi.updateBom(ctx.companyId, editingId.value, payload)
+      ElMessage.success('BOM updated')
+    } else {
+      await manufacturingApi.createBom(ctx.companyId, payload)
+      ElMessage.success('BOM created')
+    }
     createOpen.value = false
     await load()
   } catch (e) {
     ElMessage.error(e?.response?.data?.message || e?.message || 'Failed')
   } finally {
     saving.value = false
+  }
+}
+
+async function onDelete(row) {
+  if (!row?.id) return
+  try {
+    await ElMessageBox.confirm(`Delete BOM #${row.id}?`, 'Confirm', {
+      type: 'warning',
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel'
+    })
+    await manufacturingApi.deleteBom(ctx.companyId, row.id)
+    ElMessage.success('BOM deleted')
+    await load()
+  } catch (e) {
+    if (e === 'cancel' || e === 'close') return
+    ElMessage.error(e?.response?.data?.message || e?.message || 'Failed')
   }
 }
 

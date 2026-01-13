@@ -56,6 +56,8 @@
         </el-table-column>
         <el-table-column label="Actions" width="260">
           <template #default="scope">
+            <el-button size="small" @click="openEdit(scope.row)" :disabled="scope.row.status !== 'DRAFTED'">Edit</el-button>
+            <el-button size="small" type="danger" plain @click="onDelete(scope.row)" :disabled="scope.row.status !== 'DRAFTED'">Delete</el-button>
             <el-button size="small" type="success" :disabled="scope.row.status !== 'DRAFTED'" @click="complete(scope.row)">Complete</el-button>
             <el-button size="small" type="danger" plain :disabled="scope.row.status === 'VOIDED'" @click="voidWo(scope.row)">Void</el-button>
           </template>
@@ -63,7 +65,7 @@
       </el-table>
     </el-card>
 
-    <el-dialog v-model="createOpen" title="Create Work Order" width="980px">
+    <el-dialog v-model="createOpen" :title="dialogTitle" width="980px">
       <el-form label-position="top">
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px">
           <el-form-item label="Work Date">
@@ -144,7 +146,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { inventoryApi, manufacturingApi, masterDataApi } from '@/utils/api'
 import { useContextStore } from '@/stores/context'
 import CompanyOrgBar from '@/views/modules/common/CompanyOrgBar.vue'
@@ -160,6 +162,11 @@ const locators = ref([])
 
 const createOpen = ref(false)
 const saving = ref(false)
+
+const editMode = ref('create')
+const editingId = ref(null)
+
+const dialogTitle = computed(() => (editMode.value === 'edit' ? 'Edit Work Order' : 'Create Work Order'))
 
 const form = reactive({
   workDate: '',
@@ -260,6 +267,8 @@ async function load() {
 }
 
 function openCreate() {
+  editMode.value = 'create'
+  editingId.value = null
   form.workDate = new Date().toISOString().slice(0, 10)
   form.orgId = ctx.orgId
   form.bomId = boms.value[0]?.id || null
@@ -270,25 +279,63 @@ function openCreate() {
   createOpen.value = true
 }
 
+function openEdit(row) {
+  if (!row?.id) return
+  editMode.value = 'edit'
+  editingId.value = row.id
+  form.workDate = row.workDate || new Date().toISOString().slice(0, 10)
+  form.orgId = row.orgId || null
+  form.bomId = row.bomId || null
+  form.qty = String(row.qty ?? '1')
+  form.fromLocatorId = row.fromLocatorId || null
+  form.toLocatorId = row.toLocatorId || null
+  form.description = row.description || ''
+  createOpen.value = true
+}
+
 async function save() {
   saving.value = true
   try {
-    await manufacturingApi.createWorkOrder(ctx.companyId, {
-      orgId: ctx.orgId || null,
+    const payload = {
+      orgId: form.orgId || null,
       bomId: form.bomId,
       workDate: form.workDate,
       qty: form.qty,
       fromLocatorId: form.fromLocatorId,
       toLocatorId: form.toLocatorId,
       description: form.description
-    })
-    ElMessage.success('Work order created')
+    }
+
+    if (editMode.value === 'edit' && editingId.value) {
+      await manufacturingApi.updateWorkOrder(ctx.companyId, editingId.value, payload)
+      ElMessage.success('Work order updated')
+    } else {
+      await manufacturingApi.createWorkOrder(ctx.companyId, payload)
+      ElMessage.success('Work order created')
+    }
     createOpen.value = false
     await load()
   } catch (e) {
     ElMessage.error(e?.response?.data?.message || e?.message || 'Failed')
   } finally {
     saving.value = false
+  }
+}
+
+async function onDelete(row) {
+  if (!row?.id) return
+  try {
+    await ElMessageBox.confirm(`Delete Work Order "${row.documentNo}"?`, 'Confirm', {
+      type: 'warning',
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel'
+    })
+    await manufacturingApi.deleteWorkOrder(ctx.companyId, row.id)
+    ElMessage.success('Work order deleted')
+    await load()
+  } catch (e) {
+    if (e === 'cancel' || e === 'close') return
+    ElMessage.error(e?.response?.data?.message || e?.message || 'Failed')
   }
 }
 
