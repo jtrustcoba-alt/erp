@@ -49,6 +49,10 @@ public class PriceList extends BaseEntity {
         this.currency = currency;
     }
 
+    public Long getCurrencyId() {
+        return currency != null ? currency.getId() : null;
+    }
+
     public String getName() {
         return name;
     }

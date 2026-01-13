@@ -22,10 +22,18 @@
         <el-table-column prop="status" label="Status" width="140" />
         <el-table-column prop="orderDate" label="Order Date" width="140" />
         <el-table-column prop="grandTotal" label="Grand Total" width="140" />
+        <el-table-column label="Action" width="200">
+          <template #default="scope">
+            <div style="display: flex; gap: 8px">
+              <el-button size="small" :disabled="!canEditRow(scope.row)" @click="openEdit(scope.row)">Edit</el-button>
+              <el-button size="small" type="danger" plain :disabled="!canEditRow(scope.row)" @click="onDelete(scope.row)">Delete</el-button>
+            </div>
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
 
-    <el-dialog v-model="createOpen" title="Create Sales Order" width="860px">
+    <el-dialog v-model="createOpen" :title="editMode === 'edit' ? 'Edit Sales Order' : 'Create Sales Order'" width="860px">
       <el-form label-position="top">
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px">
           <el-form-item label="Org">
@@ -86,7 +94,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { masterDataApi, salesApi } from '@/utils/api'
 import { useContextStore } from '@/stores/context'
 import CompanyOrgBar from '@/views/modules/common/CompanyOrgBar.vue'
@@ -103,6 +111,8 @@ const priceListVersions = ref([])
 
 const createOpen = ref(false)
 const saving = ref(false)
+const editMode = ref('create')
+const editingId = ref(null)
 
 const form = reactive({
   orgId: null,
@@ -166,6 +176,8 @@ async function load() {
 }
 
 function openCreate() {
+  editMode.value = 'create'
+  editingId.value = null
   form.orgId = ctx.orgId
   form.businessPartnerId = customers.value[0]?.id || null
   form.priceListVersionId = priceListVersions.value[0]?.id || null
@@ -175,11 +187,39 @@ function openCreate() {
   createOpen.value = true
 }
 
+function canEditRow(row) {
+  if (!ctx.companyId) return false
+  if (!row?.id) return false
+  return row.status === 'DRAFTED'
+}
+
+function openEdit(row) {
+  if (!row?.id) return
+  editMode.value = 'edit'
+  editingId.value = row.id
+
+  form.orgId = row.orgId || ctx.orgId
+  form.businessPartnerId = row.businessPartnerId || customers.value[0]?.id || null
+  form.priceListVersionId = row.priceListVersionId || priceListVersions.value[0]?.id || null
+  form.orderDate = row.orderDate || new Date().toISOString().slice(0, 10)
+
+  const lines = Array.isArray(row.lines) ? row.lines : []
+  form.lines = lines.length
+    ? lines.map((l) => ({
+        productId: l.productId,
+        qty: String(l.qty ?? '')
+      }))
+    : []
+
+  if (!form.lines.length) addLine()
+  createOpen.value = true
+}
+
 async function save() {
   saving.value = true
   try {
     const payload = {
-      orgId: ctx.orgId || null,
+      orgId: form.orgId || null,
       businessPartnerId: form.businessPartnerId,
       priceListVersionId: form.priceListVersionId,
       orderDate: form.orderDate,
@@ -189,14 +229,36 @@ async function save() {
       }))
     }
 
-    await salesApi.createSalesOrder(ctx.companyId, payload)
-    ElMessage.success('Sales Order created')
+    if (editMode.value === 'edit' && editingId.value) {
+      await salesApi.updateSalesOrder(ctx.companyId, editingId.value, payload)
+      ElMessage.success('Sales Order updated')
+    } else {
+      await salesApi.createSalesOrder(ctx.companyId, payload)
+      ElMessage.success('Sales Order created')
+    }
     createOpen.value = false
     await load()
   } catch (e) {
     ElMessage.error(e?.response?.data?.message || e?.message || 'Failed')
   } finally {
     saving.value = false
+  }
+}
+
+async function onDelete(row) {
+  if (!row?.id) return
+  try {
+    await ElMessageBox.confirm(`Delete Sales Order "${row.documentNo}"?`, 'Confirm', {
+      type: 'warning',
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel'
+    })
+    await salesApi.deleteSalesOrder(ctx.companyId, row.id)
+    ElMessage.success('Sales Order deleted')
+    await load()
+  } catch (e) {
+    if (e === 'cancel' || e === 'close') return
+    ElMessage.error(e?.response?.data?.message || e?.message || 'Failed')
   }
 }
 

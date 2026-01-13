@@ -43,4 +43,37 @@ public class WarehouseService {
 
         return warehouseRepository.save(warehouse);
     }
+
+    @Transactional
+    public Warehouse update(Long companyId, Long warehouseId, Long orgId, Warehouse patch) {
+        Warehouse existing = warehouseRepository.findById(warehouseId)
+                .orElseThrow(() -> new IllegalArgumentException("Warehouse not found"));
+        if (existing.getCompany() == null || existing.getCompany().getId() == null || !existing.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Warehouse company mismatch");
+        }
+
+        existing.setCode(patch.getCode());
+        existing.setName(patch.getName());
+        existing.setActive(patch.isActive());
+
+        if (orgId == null) {
+            existing.setOrg(null);
+        } else {
+            Org org = orgRepository.findById(orgId)
+                    .orElseThrow(() -> new IllegalArgumentException("Org not found"));
+            existing.setOrg(org);
+        }
+
+        return warehouseRepository.save(existing);
+    }
+
+    @Transactional
+    public void delete(Long companyId, Long warehouseId) {
+        Warehouse existing = warehouseRepository.findById(warehouseId)
+                .orElseThrow(() -> new IllegalArgumentException("Warehouse not found"));
+        if (existing.getCompany() == null || existing.getCompany().getId() == null || !existing.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Warehouse company mismatch");
+        }
+        warehouseRepository.delete(existing);
+    }
 }

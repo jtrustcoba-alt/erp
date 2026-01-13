@@ -56,8 +56,17 @@
             <el-menu-item index="/modules/finance/periods">Periods</el-menu-item>
             <el-menu-item index="/modules/finance/reports">Reports</el-menu-item>
           </el-sub-menu>
-          <el-menu-item index="/modules/hr">HR</el-menu-item>
-          <el-menu-item index="/modules/admin">Admin</el-menu-item>
+          <el-sub-menu index="/modules/hr">
+            <template #title>HR</template>
+            <el-menu-item index="/modules/hr">Overview</el-menu-item>
+            <el-menu-item index="/modules/hr/departments">Departments</el-menu-item>
+            <el-menu-item index="/modules/hr/employees">Employees</el-menu-item>
+          </el-sub-menu>
+          <el-sub-menu index="/modules/admin">
+            <template #title>Admin</template>
+            <el-menu-item index="/modules/admin">Overview</el-menu-item>
+            <el-menu-item index="/modules/admin/users">Users</el-menu-item>
+          </el-sub-menu>
         </el-sub-menu>
         <el-sub-menu index="/tools">
           <template #title>Tools</template>

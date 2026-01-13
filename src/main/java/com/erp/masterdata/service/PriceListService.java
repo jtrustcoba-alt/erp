@@ -41,4 +41,32 @@ public class PriceListService {
 
         return priceListRepository.save(priceList);
     }
+
+    @Transactional
+    public PriceList update(Long companyId, Long priceListId, Long currencyId, PriceList patch) {
+        PriceList existing = priceListRepository.findById(priceListId)
+                .orElseThrow(() -> new IllegalArgumentException("Price List not found"));
+        if (existing.getCompany() == null || existing.getCompany().getId() == null || !existing.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Price List company mismatch");
+        }
+
+        Currency currency = currencyRepository.findById(currencyId)
+                .orElseThrow(() -> new IllegalArgumentException("Currency not found"));
+
+        existing.setName(patch.getName());
+        existing.setSalesPriceList(patch.isSalesPriceList());
+        existing.setActive(patch.isActive());
+        existing.setCurrency(currency);
+        return priceListRepository.save(existing);
+    }
+
+    @Transactional
+    public void delete(Long companyId, Long priceListId) {
+        PriceList existing = priceListRepository.findById(priceListId)
+                .orElseThrow(() -> new IllegalArgumentException("Price List not found"));
+        if (existing.getCompany() == null || existing.getCompany().getId() == null || !existing.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Price List company mismatch");
+        }
+        priceListRepository.delete(existing);
+    }
 }

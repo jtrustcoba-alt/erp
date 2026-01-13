@@ -51,6 +51,10 @@ public class Warehouse extends BaseEntity {
         this.org = org;
     }
 
+    public Long getOrgId() {
+        return org != null ? org.getId() : null;
+    }
+
     public String getCode() {
         return code;
     }

@@ -32,4 +32,28 @@ public class UomService {
         uom.setCompany(company);
         return uomRepository.save(uom);
     }
+
+    @Transactional
+    public Uom update(Long companyId, Long uomId, Uom patch) {
+        Uom existing = uomRepository.findById(uomId)
+                .orElseThrow(() -> new IllegalArgumentException("UoM not found"));
+        if (existing.getCompany() == null || existing.getCompany().getId() == null || !existing.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("UoM company mismatch");
+        }
+
+        existing.setCode(patch.getCode());
+        existing.setName(patch.getName());
+        existing.setActive(patch.isActive());
+        return uomRepository.save(existing);
+    }
+
+    @Transactional
+    public void delete(Long companyId, Long uomId) {
+        Uom existing = uomRepository.findById(uomId)
+                .orElseThrow(() -> new IllegalArgumentException("UoM not found"));
+        if (existing.getCompany() == null || existing.getCompany().getId() == null || !existing.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("UoM company mismatch");
+        }
+        uomRepository.delete(existing);
+    }
 }

@@ -32,4 +32,29 @@ public class CurrencyService {
         currency.setCompany(company);
         return currencyRepository.save(currency);
     }
+
+    @Transactional
+    public Currency update(Long companyId, Long currencyId, Currency patch) {
+        Currency existing = currencyRepository.findById(currencyId)
+                .orElseThrow(() -> new IllegalArgumentException("Currency not found"));
+        if (existing.getCompany() == null || existing.getCompany().getId() == null || !existing.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Currency company mismatch");
+        }
+
+        existing.setCode(patch.getCode());
+        existing.setName(patch.getName());
+        existing.setPrecisionValue(patch.getPrecisionValue());
+        existing.setActive(patch.isActive());
+        return currencyRepository.save(existing);
+    }
+
+    @Transactional
+    public void delete(Long companyId, Long currencyId) {
+        Currency existing = currencyRepository.findById(currencyId)
+                .orElseThrow(() -> new IllegalArgumentException("Currency not found"));
+        if (existing.getCompany() == null || existing.getCompany().getId() == null || !existing.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Currency company mismatch");
+        }
+        currencyRepository.delete(existing);
+    }
 }

@@ -32,4 +32,30 @@ public class BusinessPartnerService {
         partner.setCompany(company);
         return businessPartnerRepository.save(partner);
     }
+
+    @Transactional
+    public BusinessPartner update(Long companyId, Long businessPartnerId, BusinessPartner patch) {
+        BusinessPartner existing = businessPartnerRepository.findById(businessPartnerId)
+                .orElseThrow(() -> new IllegalArgumentException("Business Partner not found"));
+        if (existing.getCompany() == null || existing.getCompany().getId() == null || !existing.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Business Partner company mismatch");
+        }
+
+        existing.setName(patch.getName());
+        existing.setEmail(patch.getEmail());
+        existing.setPhone(patch.getPhone());
+        existing.setType(patch.getType());
+        existing.setActive(patch.isActive());
+        return businessPartnerRepository.save(existing);
+    }
+
+    @Transactional
+    public void delete(Long companyId, Long businessPartnerId) {
+        BusinessPartner existing = businessPartnerRepository.findById(businessPartnerId)
+                .orElseThrow(() -> new IllegalArgumentException("Business Partner not found"));
+        if (existing.getCompany() == null || existing.getCompany().getId() == null || !existing.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Business Partner company mismatch");
+        }
+        businessPartnerRepository.delete(existing);
+    }
 }

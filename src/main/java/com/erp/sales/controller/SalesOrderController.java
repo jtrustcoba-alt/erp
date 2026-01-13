@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +18,7 @@ import com.erp.sales.dto.SalesOrderLineDto;
 import com.erp.sales.entity.SalesOrder;
 import com.erp.sales.entity.SalesOrderLine;
 import com.erp.sales.request.CreateSalesOrderRequest;
+import com.erp.sales.request.UpdateSalesOrderRequest;
 import com.erp.sales.service.SalesOrderService;
 
 import jakarta.validation.Valid;
@@ -40,6 +43,21 @@ public class SalesOrderController {
     public ResponseEntity<SalesOrderDto> create(@PathVariable Long companyId, @Valid @RequestBody CreateSalesOrderRequest request) {
         SalesOrder saved = salesOrderService.create(companyId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(saved));
+    }
+
+    @PutMapping("/{salesOrderId}")
+    public ResponseEntity<SalesOrderDto> update(
+            @PathVariable Long companyId,
+            @PathVariable Long salesOrderId,
+            @Valid @RequestBody UpdateSalesOrderRequest request) {
+        SalesOrder saved = salesOrderService.update(companyId, salesOrderId, request);
+        return ResponseEntity.ok(toDto(saved));
+    }
+
+    @DeleteMapping("/{salesOrderId}")
+    public ResponseEntity<Void> delete(@PathVariable Long companyId, @PathVariable Long salesOrderId) {
+        salesOrderService.delete(companyId, salesOrderId);
+        return ResponseEntity.noContent().build();
     }
 
     private SalesOrderDto toDto(SalesOrder so) {

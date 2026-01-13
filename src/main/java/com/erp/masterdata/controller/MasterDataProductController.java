@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,6 +46,21 @@ public class MasterDataProductController {
                 .body(productService.create(companyId, request.getUomId(), p));
     }
 
+    @PutMapping("/{productId}")
+    public ResponseEntity<Product> update(@PathVariable Long companyId, @PathVariable Long productId, @Valid @RequestBody UpdateProductRequest request) {
+        Product patch = new Product();
+        patch.setCode(request.getCode());
+        patch.setName(request.getName());
+        patch.setActive(request.isActive());
+        return ResponseEntity.ok(productService.update(companyId, productId, request.getUomId(), patch));
+    }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Void> delete(@PathVariable Long companyId, @PathVariable Long productId) {
+        productService.delete(companyId, productId);
+        return ResponseEntity.noContent().build();
+    }
+
     public static class CreateProductRequest {
         @NotBlank
         private String code;
@@ -76,6 +93,51 @@ public class MasterDataProductController {
 
         public void setUomId(Long uomId) {
             this.uomId = uomId;
+        }
+    }
+
+    public static class UpdateProductRequest {
+        @NotBlank
+        private String code;
+
+        @NotBlank
+        private String name;
+
+        @NotNull
+        private Long uomId;
+
+        private boolean active = true;
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Long getUomId() {
+            return uomId;
+        }
+
+        public void setUomId(Long uomId) {
+            this.uomId = uomId;
+        }
+
+        public boolean isActive() {
+            return active;
+        }
+
+        public void setActive(boolean active) {
+            this.active = active;
         }
     }
 }

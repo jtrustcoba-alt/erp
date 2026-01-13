@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.erp.core.entity.Company;
 import com.erp.core.entity.Org;
+import com.erp.core.model.DocumentStatus;
 import com.erp.core.model.DocumentType;
 import com.erp.core.repository.CompanyRepository;
 import com.erp.core.repository.OrgRepository;
@@ -25,6 +26,7 @@ import com.erp.sales.entity.SalesOrder;
 import com.erp.sales.entity.SalesOrderLine;
 import com.erp.sales.repository.SalesOrderRepository;
 import com.erp.sales.request.CreateSalesOrderRequest;
+import com.erp.sales.request.UpdateSalesOrderRequest;
 
 @Service
 public class SalesOrderService {
@@ -119,5 +121,78 @@ public class SalesOrderService {
         so.setGrandTotal(totalNet);
 
         return salesOrderRepository.save(so);
+    }
+
+    @Transactional
+    public SalesOrder update(Long companyId, Long salesOrderId, UpdateSalesOrderRequest request) {
+        SalesOrder so = salesOrderRepository.findById(salesOrderId)
+                .orElseThrow(() -> new IllegalArgumentException("Sales Order not found"));
+        if (so.getCompany() == null || so.getCompany().getId() == null || !so.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Sales Order company mismatch");
+        }
+        if (so.getStatus() != DocumentStatus.DRAFTED) {
+            throw new IllegalArgumentException("Only DRAFTED Sales Order can be updated");
+        }
+
+        Org org = null;
+        if (request.getOrgId() != null) {
+            org = orgRepository.findById(request.getOrgId())
+                    .orElseThrow(() -> new IllegalArgumentException("Org not found"));
+        }
+
+        BusinessPartner bp = businessPartnerRepository.findById(request.getBusinessPartnerId())
+                .orElseThrow(() -> new IllegalArgumentException("BusinessPartner not found"));
+
+        PriceListVersion plv = priceListVersionRepository.findById(request.getPriceListVersionId())
+                .orElseThrow(() -> new IllegalArgumentException("PriceListVersion not found"));
+
+        so.setOrg(org);
+        so.setBusinessPartner(bp);
+        so.setPriceListVersion(plv);
+        so.setOrderDate(request.getOrderDate());
+
+        so.getLines().clear();
+        BigDecimal totalNet = BigDecimal.ZERO;
+
+        for (UpdateSalesOrderRequest.UpdateSalesOrderLineRequest lineReq : request.getLines()) {
+            Product product = productRepository.findById(lineReq.getProductId())
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+            ProductPrice productPrice = productPriceRepository
+                    .findByPriceListVersion_IdAndProduct_Id(plv.getId(), product.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Product price not found for productId=" + product.getId()));
+
+            BigDecimal qty = lineReq.getQty();
+            BigDecimal price = productPrice.getPrice();
+            BigDecimal lineNet = price.multiply(qty);
+
+            SalesOrderLine sol = new SalesOrderLine();
+            sol.setSalesOrder(so);
+            sol.setProduct(product);
+            sol.setUom(product.getUom());
+            sol.setQty(qty);
+            sol.setPrice(price);
+            sol.setLineNet(lineNet);
+
+            so.getLines().add(sol);
+            totalNet = totalNet.add(lineNet);
+        }
+        so.setTotalNet(totalNet);
+        so.setTotalTax(BigDecimal.ZERO);
+        so.setGrandTotal(totalNet);
+        return salesOrderRepository.save(so);
+    }
+
+    @Transactional
+    public void delete(Long companyId, Long salesOrderId) {
+        SalesOrder so = salesOrderRepository.findById(salesOrderId)
+                .orElseThrow(() -> new IllegalArgumentException("Sales Order not found"));
+        if (so.getCompany() == null || so.getCompany().getId() == null || !so.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Sales Order company mismatch");
+        }
+        if (so.getStatus() != DocumentStatus.DRAFTED) {
+            throw new IllegalArgumentException("Only DRAFTED Sales Order can be deleted");
+        }
+        salesOrderRepository.delete(so);
     }
 }

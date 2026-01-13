@@ -22,7 +22,13 @@
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
         <div>
-          <div style="font-weight: 600; margin-bottom: 8px">Price Lists</div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px">
+            <div style="font-weight: 600">Price Lists</div>
+            <div style="display: flex; gap: 8px; align-items: center">
+              <el-button size="small" :disabled="!selectedPriceListId" @click="openEdit">Edit</el-button>
+              <el-button size="small" type="danger" plain :disabled="!selectedPriceListId" @click="onDelete">Delete</el-button>
+            </div>
+          </div>
           <el-table :data="priceLists" highlight-current-row @current-change="onSelectPriceList" v-loading="loading" style="width: 100%">
             <el-table-column prop="name" label="Name" />
             <el-table-column prop="salesPriceList" label="Sales" width="100">
@@ -125,6 +131,34 @@
       </template>
     </el-dialog>
 
+    <el-dialog v-model="editOpen" title="Edit Price List" width="640px">
+      <el-form label-position="top">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+          <el-form-item label="Name">
+            <el-input v-model="editForm.name" placeholder="e.g. Default Sales PL" />
+          </el-form-item>
+          <el-form-item label="Currency">
+            <el-select v-model="editForm.currencyId" filterable placeholder="Select currency" style="width: 100%" :disabled="currencies.length === 0">
+              <el-option v-for="c in currencies" :key="c.id" :label="`${c.code} - ${c.name}`" :value="c.id" />
+            </el-select>
+          </el-form-item>
+        </div>
+
+        <el-form-item>
+          <el-checkbox v-model="editForm.salesPriceList">Sales Price List</el-checkbox>
+        </el-form-item>
+
+        <el-form-item label="Active">
+          <el-switch v-model="editForm.active" />
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <el-button @click="editOpen = false">Cancel</el-button>
+        <el-button type="primary" :loading="editSaving" :disabled="!canEditSave" @click="saveEdit">Save</el-button>
+      </template>
+    </el-dialog>
+
     <el-dialog v-model="createVersionOpen" title="Create Price List Version" width="520px">
       <el-form label-position="top">
         <el-form-item label="Valid From">
@@ -142,7 +176,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { masterDataApi } from '@/utils/api'
 import { useContextStore } from '@/stores/context'
 import CompanyOrgBar from '@/views/modules/common/CompanyOrgBar.vue'
@@ -174,6 +208,18 @@ const form = reactive({
 })
 
 const canSave = computed(() => Boolean(ctx.companyId && form.name.trim() && form.currencyId))
+
+const editOpen = ref(false)
+const editSaving = ref(false)
+
+const editForm = reactive({
+  name: '',
+  currencyId: null,
+  salesPriceList: true,
+  active: true
+})
+
+const canEditSave = computed(() => Boolean(ctx.companyId && selectedPriceListId.value && editForm.name.trim() && editForm.currencyId))
 
 const createVersionOpen = ref(false)
 const versionSaving = ref(false)
@@ -207,6 +253,48 @@ async function load() {
   if (priceLists.value.length && !selectedPriceListId.value) {
     selectedPriceListId.value = priceLists.value[0].id
     await loadVersions(selectedPriceListId.value)
+  }
+}
+
+async function saveEdit() {
+  editSaving.value = true
+  try {
+    const saved = await masterDataApi.updatePriceList(ctx.companyId, selectedPriceListId.value, {
+      name: editForm.name,
+      currencyId: editForm.currencyId,
+      salesPriceList: Boolean(editForm.salesPriceList),
+      active: Boolean(editForm.active)
+    })
+    ElMessage.success('Price List updated')
+    editOpen.value = false
+    await load()
+
+    if (saved?.id) {
+      selectedPriceListId.value = saved.id
+      await loadVersions(saved.id)
+    }
+  } catch (e) {
+    ElMessage.error(e?.response?.data?.message || e?.message || 'Failed')
+  } finally {
+    editSaving.value = false
+  }
+}
+
+async function onDelete() {
+  if (!selectedPriceList.value?.id) return
+  try {
+    await ElMessageBox.confirm(`Delete Price List "${selectedPriceList.value.name}"?`, 'Confirm', {
+      type: 'warning',
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel'
+    })
+    await masterDataApi.deletePriceList(ctx.companyId, selectedPriceList.value.id)
+    ElMessage.success('Price List deleted')
+    selectedPriceListId.value = null
+    await load()
+  } catch (e) {
+    if (e === 'cancel' || e === 'close') return
+    ElMessage.error(e?.response?.data?.message || e?.message || 'Failed')
   }
 }
 
@@ -298,6 +386,15 @@ function openCreate() {
   form.currencyId = currencies.value[0]?.id || null
   form.salesPriceList = true
   createOpen.value = true
+}
+
+function openEdit() {
+  if (!selectedPriceList.value) return
+  editForm.name = selectedPriceList.value.name || ''
+  editForm.currencyId = selectedPriceList.value.currencyId || currencies.value[0]?.id || null
+  editForm.salesPriceList = Boolean(selectedPriceList.value.salesPriceList)
+  editForm.active = Boolean(selectedPriceList.value.active)
+  editOpen.value = true
 }
 
 async function save() {

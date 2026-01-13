@@ -66,6 +66,10 @@ public class Product extends BaseEntity {
         this.uom = uom;
     }
 
+    public Long getUomId() {
+        return uom != null ? uom.getId() : null;
+    }
+
     public boolean isActive() {
         return active;
     }

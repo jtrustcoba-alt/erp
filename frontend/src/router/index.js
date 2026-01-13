@@ -27,6 +27,9 @@ import ManufacturingReportsView from '@/views/modules/manufacturing/ReportsView.
 import FinanceGlAccountsView from '@/views/modules/finance/GlAccountsView.vue'
 import FinancePeriodsView from '@/views/modules/finance/PeriodsView.vue'
 import FinanceReportsView from '@/views/modules/finance/ReportsView.vue'
+import HrDepartmentsView from '@/views/modules/hr/DepartmentsView.vue'
+import HrEmployeesView from '@/views/modules/hr/EmployeesView.vue'
+import AdminUsersView from '@/views/modules/admin/UsersView.vue'
 import ApiExplorerView from '@/views/tools/ApiExplorerView.vue'
 
 const router = createRouter({
@@ -63,6 +66,9 @@ const router = createRouter({
         { path: 'modules/finance/gl-accounts', name: 'fin-gl-accounts', component: FinanceGlAccountsView },
         { path: 'modules/finance/periods', name: 'fin-periods', component: FinancePeriodsView },
         { path: 'modules/finance/reports', name: 'fin-reports', component: FinanceReportsView },
+        { path: 'modules/hr/departments', name: 'hr-departments', component: HrDepartmentsView },
+        { path: 'modules/hr/employees', name: 'hr-employees', component: HrEmployeesView },
+        { path: 'modules/admin/users', name: 'admin-users', component: AdminUsersView },
         { path: 'tools/api-explorer', name: 'api-explorer', component: ApiExplorerView }
       ]
     }

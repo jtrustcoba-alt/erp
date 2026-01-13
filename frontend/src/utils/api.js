@@ -31,21 +31,37 @@ export const coreApi = {
 export const masterDataApi = {
   listUoms: (companyId) => http.get(`/api/masterdata/companies/${companyId}/uoms`).then((r) => r.data),
   createUom: (companyId, payload) => http.post(`/api/masterdata/companies/${companyId}/uoms`, payload).then((r) => r.data),
+  updateUom: (companyId, uomId, payload) => http.put(`/api/masterdata/companies/${companyId}/uoms/${uomId}`, payload).then((r) => r.data),
+  deleteUom: (companyId, uomId) => http.delete(`/api/masterdata/companies/${companyId}/uoms/${uomId}`).then((r) => r.data),
 
   listCurrencies: (companyId) => http.get(`/api/masterdata/companies/${companyId}/currencies`).then((r) => r.data),
   createCurrency: (companyId, payload) => http.post(`/api/masterdata/companies/${companyId}/currencies`, payload).then((r) => r.data),
+  updateCurrency: (companyId, currencyId, payload) =>
+    http.put(`/api/masterdata/companies/${companyId}/currencies/${currencyId}`, payload).then((r) => r.data),
+  deleteCurrency: (companyId, currencyId) => http.delete(`/api/masterdata/companies/${companyId}/currencies/${currencyId}`).then((r) => r.data),
 
   listProducts: (companyId) => http.get(`/api/masterdata/companies/${companyId}/products`).then((r) => r.data),
   createProduct: (companyId, payload) => http.post(`/api/masterdata/companies/${companyId}/products`, payload).then((r) => r.data),
+  updateProduct: (companyId, productId, payload) => http.put(`/api/masterdata/companies/${companyId}/products/${productId}`, payload).then((r) => r.data),
+  deleteProduct: (companyId, productId) => http.delete(`/api/masterdata/companies/${companyId}/products/${productId}`).then((r) => r.data),
 
   listWarehouses: (companyId) => http.get(`/api/masterdata/companies/${companyId}/warehouses`).then((r) => r.data),
   createWarehouse: (companyId, payload) => http.post(`/api/masterdata/companies/${companyId}/warehouses`, payload).then((r) => r.data),
+  updateWarehouse: (companyId, warehouseId, payload) =>
+    http.put(`/api/masterdata/companies/${companyId}/warehouses/${warehouseId}`, payload).then((r) => r.data),
+  deleteWarehouse: (companyId, warehouseId) => http.delete(`/api/masterdata/companies/${companyId}/warehouses/${warehouseId}`).then((r) => r.data),
 
   listBusinessPartners: (companyId) => http.get(`/api/masterdata/companies/${companyId}/business-partners`).then((r) => r.data),
   createBusinessPartner: (companyId, payload) => http.post(`/api/masterdata/companies/${companyId}/business-partners`, payload).then((r) => r.data),
+  updateBusinessPartner: (companyId, businessPartnerId, payload) =>
+    http.put(`/api/masterdata/companies/${companyId}/business-partners/${businessPartnerId}`, payload).then((r) => r.data),
+  deleteBusinessPartner: (companyId, businessPartnerId) =>
+    http.delete(`/api/masterdata/companies/${companyId}/business-partners/${businessPartnerId}`).then((r) => r.data),
 
   listPriceLists: (companyId) => http.get(`/api/masterdata/companies/${companyId}/price-lists`).then((r) => r.data),
   createPriceList: (companyId, payload) => http.post(`/api/masterdata/companies/${companyId}/price-lists`, payload).then((r) => r.data),
+  updatePriceList: (companyId, priceListId, payload) => http.put(`/api/masterdata/companies/${companyId}/price-lists/${priceListId}`, payload).then((r) => r.data),
+  deletePriceList: (companyId, priceListId) => http.delete(`/api/masterdata/companies/${companyId}/price-lists/${priceListId}`).then((r) => r.data),
 
   listPriceListVersions: (priceListId) => http.get(`/api/masterdata/price-lists/${priceListId}/versions`).then((r) => r.data),
   createPriceListVersion: (priceListId, payload) => http.post(`/api/masterdata/price-lists/${priceListId}/versions`, payload).then((r) => r.data),
@@ -79,7 +95,10 @@ export const purchaseApi = {
 
 export const salesApi = {
   listSalesOrders: (companyId) => http.get(`/api/sales/companies/${companyId}/sales-orders`).then((r) => r.data),
-  createSalesOrder: (companyId, payload) => http.post(`/api/sales/companies/${companyId}/sales-orders`, payload).then((r) => r.data)
+  createSalesOrder: (companyId, payload) => http.post(`/api/sales/companies/${companyId}/sales-orders`, payload).then((r) => r.data),
+  updateSalesOrder: (companyId, salesOrderId, payload) =>
+    http.put(`/api/sales/companies/${companyId}/sales-orders/${salesOrderId}`, payload).then((r) => r.data),
+  deleteSalesOrder: (companyId, salesOrderId) => http.delete(`/api/sales/companies/${companyId}/sales-orders/${salesOrderId}`).then((r) => r.data)
 }
 
 export const manufacturingApi = {
@@ -119,4 +138,18 @@ export const financeApi = {
   trialBalanceReport: (companyId, params) => http.get(`/api/finance/companies/${companyId}/reports/trial-balance`, { params }).then((r) => r.data),
   profitLossReport: (companyId, params) => http.get(`/api/finance/companies/${companyId}/reports/profit-loss`, { params }).then((r) => r.data),
   balanceSheetReport: (companyId, params) => http.get(`/api/finance/companies/${companyId}/reports/balance-sheet`, { params }).then((r) => r.data)
+}
+
+export const hrApi = {
+  listDepartments: () => http.get('/api/departments').then((r) => r.data),
+  createDepartment: (payload) => http.post('/api/departments', payload).then((r) => r.data),
+  updateDepartment: (id, payload) => http.put(`/api/departments/${id}`, payload).then((r) => r.data),
+  deleteDepartment: (id) => http.delete(`/api/departments/${id}`).then((r) => r.data),
+
+  listEmployees: () => http.get('/api/employees').then((r) => r.data),
+  listEmployeesPaged: (params) => http.get('/api/employees/paged', { params }).then((r) => r.data),
+  createEmployee: (payload) => http.post('/api/employees', payload).then((r) => r.data),
+  updateEmployee: (id, payload) => http.put(`/api/employees/${id}`, payload).then((r) => r.data),
+  deleteEmployee: (id) => http.delete(`/api/employees/${id}`).then((r) => r.data),
+  toggleEmployeeStatus: (id) => http.put(`/api/employees/${id}/toggle-status`).then((r) => r.data)
 }

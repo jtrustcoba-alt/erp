@@ -88,7 +88,10 @@ export const modules = [
     title: 'HR',
     description: 'HR Operations: Employee, Department, Attendance, Leave, Performance, Payroll.',
     flow: ['Create Department', 'Create Employee', 'Mark Attendance', 'Leave Request & Approval', 'Performance Review', 'Payslip/Salary'],
-    pages: [],
+    pages: [
+      { title: 'Departments', description: 'Setup department untuk struktur organisasi', to: '/modules/hr/departments' },
+      { title: 'Employees', description: 'Master data employee (role, dept, salary, active)', to: '/modules/hr/employees' }
+    ],
     match: ['/api/employees', '/api/departments', '/api/attendance', '/api/leaves', '/api/performance-reviews', '/api/payslips', '/api/salaries']
   },
   {
@@ -96,7 +99,7 @@ export const modules = [
     title: 'Admin',
     description: 'User management (khusus ADMIN).',
     flow: ['Create User', 'Update User', 'Reset Password', 'Change Status', 'List Users'],
-    pages: [],
+    pages: [{ title: 'Users', description: 'Create/update user, reset password, change status, delete', to: '/modules/admin/users' }],
     match: ['/admin/']
   }
 ]
