@@ -21,6 +21,12 @@ import LocatorsView from '@/views/modules/inventory/LocatorsView.vue'
 import OnHandView from '@/views/modules/inventory/OnHandView.vue'
 import MovementsView from '@/views/modules/inventory/MovementsView.vue'
 import AdjustmentsView from '@/views/modules/inventory/AdjustmentsView.vue'
+import BomsView from '@/views/modules/manufacturing/BomsView.vue'
+import WorkOrdersView from '@/views/modules/manufacturing/WorkOrdersView.vue'
+import ManufacturingReportsView from '@/views/modules/manufacturing/ReportsView.vue'
+import FinanceGlAccountsView from '@/views/modules/finance/GlAccountsView.vue'
+import FinancePeriodsView from '@/views/modules/finance/PeriodsView.vue'
+import FinanceReportsView from '@/views/modules/finance/ReportsView.vue'
 import ApiExplorerView from '@/views/tools/ApiExplorerView.vue'
 
 const router = createRouter({
@@ -51,6 +57,12 @@ const router = createRouter({
         { path: 'modules/inventory/onhand', name: 'inv-onhand', component: OnHandView },
         { path: 'modules/inventory/movements', name: 'inv-movements', component: MovementsView },
         { path: 'modules/inventory/adjustments', name: 'inv-adjustments', component: AdjustmentsView },
+        { path: 'modules/manufacturing/boms', name: 'mfg-boms', component: BomsView },
+        { path: 'modules/manufacturing/work-orders', name: 'mfg-work-orders', component: WorkOrdersView },
+        { path: 'modules/manufacturing/reports', name: 'mfg-reports', component: ManufacturingReportsView },
+        { path: 'modules/finance/gl-accounts', name: 'fin-gl-accounts', component: FinanceGlAccountsView },
+        { path: 'modules/finance/periods', name: 'fin-periods', component: FinancePeriodsView },
+        { path: 'modules/finance/reports', name: 'fin-reports', component: FinanceReportsView },
         { path: 'tools/api-explorer', name: 'api-explorer', component: ApiExplorerView }
       ]
     }

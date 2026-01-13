@@ -81,3 +81,42 @@ export const salesApi = {
   listSalesOrders: (companyId) => http.get(`/api/sales/companies/${companyId}/sales-orders`).then((r) => r.data),
   createSalesOrder: (companyId, payload) => http.post(`/api/sales/companies/${companyId}/sales-orders`, payload).then((r) => r.data)
 }
+
+export const manufacturingApi = {
+  listBoms: (companyId) => http.get(`/api/manufacturing/companies/${companyId}/boms`).then((r) => r.data),
+  getBom: (companyId, bomId) => http.get(`/api/manufacturing/companies/${companyId}/boms/${bomId}`).then((r) => r.data),
+  createBom: (companyId, payload) => http.post(`/api/manufacturing/companies/${companyId}/boms`, payload).then((r) => r.data),
+
+  listWorkOrders: (companyId) => http.get(`/api/manufacturing/companies/${companyId}/work-orders`).then((r) => r.data),
+  getWorkOrder: (companyId, workOrderId) =>
+    http.get(`/api/manufacturing/companies/${companyId}/work-orders/${workOrderId}`).then((r) => r.data),
+  createWorkOrder: (companyId, payload) => http.post(`/api/manufacturing/companies/${companyId}/work-orders`, payload).then((r) => r.data),
+  completeWorkOrder: (companyId, workOrderId, payload) =>
+    http.post(`/api/manufacturing/companies/${companyId}/work-orders/${workOrderId}/complete`, payload).then((r) => r.data),
+  voidWorkOrder: (companyId, workOrderId, payload) =>
+    http.post(`/api/manufacturing/companies/${companyId}/work-orders/${workOrderId}/void`, payload).then((r) => r.data),
+
+  wipReport: (companyId) => http.get(`/api/manufacturing/companies/${companyId}/reports/wip`).then((r) => r.data),
+  productionCost: (companyId, params) =>
+    http.get(`/api/manufacturing/companies/${companyId}/reports/production-cost`, { params }).then((r) => r.data)
+}
+
+export const financeApi = {
+  listGlAccounts: (companyId) => http.get(`/api/finance/companies/${companyId}/gl-accounts`).then((r) => r.data),
+  createGlAccount: (companyId, payload) => http.post(`/api/finance/companies/${companyId}/gl-accounts`, payload).then((r) => r.data),
+  seedDefaultGlAccounts: (companyId) => http.post(`/api/finance/companies/${companyId}/gl-accounts/seed-defaults`).then((r) => r.data),
+
+  listFiscalYears: (companyId) => http.get(`/api/finance/companies/${companyId}/periods/fiscal-years`).then((r) => r.data),
+  createFiscalYear: (companyId, payload) => http.post(`/api/finance/companies/${companyId}/periods/fiscal-years`, payload).then((r) => r.data),
+  closeFiscalYear: (companyId, fiscalYearId) => http.post(`/api/finance/companies/${companyId}/periods/fiscal-years/${fiscalYearId}/close`).then((r) => r.data),
+  openFiscalYear: (companyId, fiscalYearId) => http.post(`/api/finance/companies/${companyId}/periods/fiscal-years/${fiscalYearId}/open`).then((r) => r.data),
+  listPeriods: (companyId, fiscalYearId) => http.get(`/api/finance/companies/${companyId}/periods/fiscal-years/${fiscalYearId}`).then((r) => r.data),
+  closePeriod: (companyId, periodId) => http.post(`/api/finance/companies/${companyId}/periods/${periodId}/close`).then((r) => r.data),
+  openPeriod: (companyId, periodId) => http.post(`/api/finance/companies/${companyId}/periods/${periodId}/open`).then((r) => r.data),
+
+  agingReport: (companyId, params) => http.get(`/api/finance/companies/${companyId}/reports/aging`, { params }).then((r) => r.data),
+  glSummaryReport: (companyId, params) => http.get(`/api/finance/companies/${companyId}/reports/gl-summary`, { params }).then((r) => r.data),
+  trialBalanceReport: (companyId, params) => http.get(`/api/finance/companies/${companyId}/reports/trial-balance`, { params }).then((r) => r.data),
+  profitLossReport: (companyId, params) => http.get(`/api/finance/companies/${companyId}/reports/profit-loss`, { params }).then((r) => r.data),
+  balanceSheetReport: (companyId, params) => http.get(`/api/finance/companies/${companyId}/reports/balance-sheet`, { params }).then((r) => r.data)
+}

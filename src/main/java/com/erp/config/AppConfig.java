@@ -32,7 +32,7 @@ public class AppConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless authentication
             .authorizeHttpRequests(authz -> authz
                 // Role-based access control for your ERP project
-                .requestMatchers("/api/finance/**").hasRole("FINANCE") // Only Finance role can access finance-related APIs
+                .requestMatchers("/api/finance/**").hasAnyRole("FINANCE", "ADMIN") // Allow Finance role and Admin to access finance-related APIs
                 .requestMatchers("/api/hr/**").hasRole("HR") // Only HR role can access HR-related APIs
                 .requestMatchers("/api/inventory/**").hasAnyRole("INVENTORY", "ADMIN") // Allow Inventory role and Admin to access inventory APIs
                 .requestMatchers("/api/admin/**").hasRole("ADMIN") // Only Admin can access admin-related APIs
@@ -53,10 +53,10 @@ public class AppConfig {
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration cfg = new CorsConfiguration();
-                cfg.setAllowedOrigins(Arrays.asList(
-                    "http://localhost:3000",  // Update frontend URL if hosted elsewhere
-                    "http://localhost:8080",
-                    "http://localhost:5173"   // Vite default port
+                cfg.setAllowedOriginPatterns(Arrays.asList(
+                    "http://localhost:*",
+                    "http://127.0.0.1:*",
+                    "http://192.168.*.*:*"
                 ));
                 cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 cfg.setAllowCredentials(true);  // Allow credentials like JWT token

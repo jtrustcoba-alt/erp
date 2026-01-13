@@ -64,7 +64,11 @@ export const modules = [
     title: 'Manufacturing',
     description: 'BOM, Work Order, dan laporan produksi.',
     flow: ['Create BOM', 'Create Work Order', 'Complete/Void Work Order', 'Manufacturing Reports'],
-    pages: [],
+    pages: [
+      { title: 'BOMs', description: 'Buat Bill of Materials (finished good + komponen)', to: '/modules/manufacturing/boms' },
+      { title: 'Work Orders', description: 'Buat dan proses Work Order (complete/void)', to: '/modules/manufacturing/work-orders' },
+      { title: 'Reports', description: 'WIP dan estimasi biaya produksi', to: '/modules/manufacturing/reports' }
+    ],
     match: ['/api/manufacturing/']
   },
   {
@@ -72,7 +76,11 @@ export const modules = [
     title: 'Finance',
     description: 'Accounting/Finance: GL Account, Journal, Invoice, Payment, Bank, Budget, Period, Reports.',
     flow: ['Setup Fiscal Year/Period', 'Seed GL Accounts', 'Post Invoice', 'Receive/Make Payment', 'Reconcile Bank Statement', 'Run Reports'],
-    pages: [],
+    pages: [
+      { title: 'GL Accounts', description: 'Chart of Accounts (create + seed defaults)', to: '/modules/finance/gl-accounts' },
+      { title: 'Periods', description: 'Fiscal Year & Accounting Period (open/close)', to: '/modules/finance/periods' },
+      { title: 'Reports', description: 'Aging, GL Summary, Trial Balance, P/L, Balance Sheet', to: '/modules/finance/reports' }
+    ],
     match: ['/api/finance/']
   },
   {

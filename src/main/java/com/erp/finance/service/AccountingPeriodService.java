@@ -64,6 +64,7 @@ public class AccountingPeriodService {
             p.setPeriodNo(periodNo);
             p.setStartDate(start);
             p.setEndDate(end);
+            p.setName(String.format("FY%d-P%02d (%s..%s)", fy.getYear(), periodNo, start, end));
             p.setStatus(PeriodStatus.OPEN);
             periods.add(accountingPeriodRepository.save(p));
 

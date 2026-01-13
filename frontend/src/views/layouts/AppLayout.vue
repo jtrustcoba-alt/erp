@@ -42,8 +42,20 @@
             <el-menu-item index="/modules/inventory/movements">Movements</el-menu-item>
             <el-menu-item index="/modules/inventory/adjustments">Adjustments</el-menu-item>
           </el-sub-menu>
-          <el-menu-item index="/modules/manufacturing">Manufacturing</el-menu-item>
-          <el-menu-item index="/modules/finance">Finance</el-menu-item>
+          <el-sub-menu index="/modules/manufacturing">
+            <template #title>Manufacturing</template>
+            <el-menu-item index="/modules/manufacturing">Overview</el-menu-item>
+            <el-menu-item index="/modules/manufacturing/boms">BOMs</el-menu-item>
+            <el-menu-item index="/modules/manufacturing/work-orders">Work Orders</el-menu-item>
+            <el-menu-item index="/modules/manufacturing/reports">Reports</el-menu-item>
+          </el-sub-menu>
+          <el-sub-menu index="/modules/finance">
+            <template #title>Finance</template>
+            <el-menu-item index="/modules/finance">Overview</el-menu-item>
+            <el-menu-item index="/modules/finance/gl-accounts">GL Accounts</el-menu-item>
+            <el-menu-item index="/modules/finance/periods">Periods</el-menu-item>
+            <el-menu-item index="/modules/finance/reports">Reports</el-menu-item>
+          </el-sub-menu>
           <el-menu-item index="/modules/hr">HR</el-menu-item>
           <el-menu-item index="/modules/admin">Admin</el-menu-item>
         </el-sub-menu>
