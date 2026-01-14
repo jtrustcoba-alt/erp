@@ -60,6 +60,12 @@ public class PurchaseOrderController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{purchaseOrderId}/approve")
+    public ResponseEntity<PurchaseOrderDto> approve(@PathVariable Long companyId, @PathVariable Long purchaseOrderId) {
+        PurchaseOrder updated = purchaseOrderService.approve(companyId, purchaseOrderId);
+        return ResponseEntity.ok(toDto(updated));
+    }
+
     private PurchaseOrderDto toDto(PurchaseOrder po) {
         PurchaseOrderDto dto = new PurchaseOrderDto();
         dto.setId(po.getId());

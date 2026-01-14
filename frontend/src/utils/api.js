@@ -98,7 +98,11 @@ export const purchaseApi = {
   updatePurchaseOrder: (companyId, purchaseOrderId, payload) =>
     http.put(`/api/purchase/companies/${companyId}/purchase-orders/${purchaseOrderId}`, payload).then((r) => r.data),
   deletePurchaseOrder: (companyId, purchaseOrderId) =>
-    http.delete(`/api/purchase/companies/${companyId}/purchase-orders/${purchaseOrderId}`).then((r) => r.data)
+    http.delete(`/api/purchase/companies/${companyId}/purchase-orders/${purchaseOrderId}`).then((r) => r.data),
+  approvePurchaseOrder: (companyId, purchaseOrderId) =>
+    http.post(`/api/purchase/companies/${companyId}/purchase-orders/${purchaseOrderId}/approve`).then((r) => r.data),
+  createGoodsReceipt: (companyId, purchaseOrderId, payload) =>
+    http.post(`/api/purchase/companies/${companyId}/purchase-orders/${purchaseOrderId}/goods-receipts`, payload).then((r) => r.data)
 }
 
 export const salesApi = {

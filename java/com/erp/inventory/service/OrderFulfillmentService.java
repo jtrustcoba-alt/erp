@@ -1,6 +1,7 @@
 package com.erp.inventory.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -8,7 +9,16 @@ import java.util.function.Function;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.erp.core.model.DocumentType;
 import com.erp.core.model.DocumentStatus;
+import com.erp.core.service.DocumentNoService;
+import com.erp.finance.entity.AccountingPeriod;
+import com.erp.finance.entity.JournalEntry;
+import com.erp.finance.entity.JournalLine;
+import com.erp.finance.model.GlAccountCode;
+import com.erp.finance.repository.AccountingPeriodRepository;
+import com.erp.finance.repository.JournalEntryRepository;
+import com.erp.finance.service.GlAccountMappingService;
 import com.erp.inventory.model.InventoryMovementType;
 import com.erp.inventory.request.CreateGoodsReceiptRequest;
 import com.erp.inventory.request.CreateGoodsShipmentRequest;
@@ -26,14 +36,26 @@ public class OrderFulfillmentService {
     private final PurchaseOrderRepository purchaseOrderRepository;
     private final SalesOrderRepository salesOrderRepository;
     private final InventoryService inventoryService;
+    private final JournalEntryRepository journalEntryRepository;
+    private final AccountingPeriodRepository accountingPeriodRepository;
+    private final GlAccountMappingService glAccountMappingService;
+    private final DocumentNoService documentNoService;
 
     public OrderFulfillmentService(
             PurchaseOrderRepository purchaseOrderRepository,
             SalesOrderRepository salesOrderRepository,
-            InventoryService inventoryService) {
+            InventoryService inventoryService,
+            JournalEntryRepository journalEntryRepository,
+            AccountingPeriodRepository accountingPeriodRepository,
+            GlAccountMappingService glAccountMappingService,
+            DocumentNoService documentNoService) {
         this.purchaseOrderRepository = purchaseOrderRepository;
         this.salesOrderRepository = salesOrderRepository;
         this.inventoryService = inventoryService;
+        this.journalEntryRepository = journalEntryRepository;
+        this.accountingPeriodRepository = accountingPeriodRepository;
+        this.glAccountMappingService = glAccountMappingService;
+        this.documentNoService = documentNoService;
     }
 
     @Transactional
@@ -43,6 +65,10 @@ public class OrderFulfillmentService {
 
         if (po.getCompany() == null || po.getCompany().getId() == null || !po.getCompany().getId().equals(companyId)) {
             throw new IllegalArgumentException("Purchase order company mismatch");
+        }
+
+        if (po.getStatus() != DocumentStatus.APPROVED && po.getStatus() != DocumentStatus.PARTIALLY_COMPLETED) {
+            throw new IllegalArgumentException("Purchase Order must be APPROVED before Goods Receipt");
         }
 
         CreateInventoryMovementRequest moveReq = new CreateInventoryMovementRequest();
@@ -80,6 +106,54 @@ public class OrderFulfillmentService {
         moveReq.setLines(lines);
 
         com.erp.inventory.entity.InventoryMovement movement = inventoryService.createMovement(companyId, moveReq);
+
+        // Post finance journal entry (minimal): Debit INVENTORY, Credit AP for received value
+        BigDecimal receiptValue = BigDecimal.ZERO;
+        for (CreateGoodsReceiptRequest.ReceiptLine lr : request.getLines()) {
+            PurchaseOrderLine pol = lineById.get(lr.getPurchaseOrderLineId());
+            BigDecimal qty = lr.getQty() != null ? lr.getQty() : BigDecimal.ZERO;
+            BigDecimal price = pol != null && pol.getPrice() != null ? pol.getPrice() : BigDecimal.ZERO;
+            receiptValue = receiptValue.add(price.multiply(qty));
+        }
+
+        if (receiptValue.compareTo(BigDecimal.ZERO) > 0) {
+            JournalEntry je = new JournalEntry();
+            je.setCompany(po.getCompany());
+            je.setOrg(po.getOrg());
+            je.setAccountingDate(request.getMovementDate());
+            je.setDescription("Goods Receipt for PO " + po.getDocumentNo());
+            je.setSourceDocumentType(DocumentType.INVENTORY_MOVEMENT);
+            je.setSourceDocumentNo(movement.getDocumentNo());
+            je.setDocumentNo(documentNoService.nextDocumentNo(companyId, DocumentType.JOURNAL_ENTRY));
+            je.setStatus(DocumentStatus.COMPLETED);
+
+            AccountingPeriod period = accountingPeriodRepository.findByCompanyIdAndDate(companyId, request.getMovementDate())
+                    .orElseThrow(() -> new IllegalArgumentException("No accounting period for date"));
+            je.setAccountingPeriod(period);
+
+            List<JournalLine> jeLines = new ArrayList<>();
+            // Debit Inventory
+            JournalLine inv = new JournalLine();
+            inv.setJournalEntry(je);
+            inv.setAccountCode(GlAccountCode.INVENTORY);
+            inv.setGlAccount(glAccountMappingService.resolve(companyId, GlAccountCode.INVENTORY));
+            inv.setDebit(receiptValue);
+            inv.setCredit(BigDecimal.ZERO);
+            jeLines.add(inv);
+
+            // Credit AP
+            JournalLine ap = new JournalLine();
+            ap.setJournalEntry(je);
+            ap.setAccountCode(GlAccountCode.AP);
+            ap.setGlAccount(glAccountMappingService.resolve(companyId, GlAccountCode.AP));
+            ap.setDebit(BigDecimal.ZERO);
+            ap.setCredit(receiptValue);
+            jeLines.add(ap);
+
+            je.setLines(jeLines);
+            journalEntryRepository.save(je);
+        }
+
         updatePurchaseOrderStatus(po);
         purchaseOrderRepository.save(po);
         return movement;

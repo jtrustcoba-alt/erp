@@ -63,6 +63,15 @@ public class PurchaseOrderService {
         return purchaseOrderRepository.findByCompanyId(companyId);
     }
 
+    public PurchaseOrder get(Long companyId, Long purchaseOrderId) {
+        PurchaseOrder po = purchaseOrderRepository.findById(purchaseOrderId)
+                .orElseThrow(() -> new IllegalArgumentException("Purchase Order not found"));
+        if (po.getCompany() == null || po.getCompany().getId() == null || !po.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Purchase Order company mismatch");
+        }
+        return po;
+    }
+
     @Transactional
     public PurchaseOrder create(Long companyId, CreatePurchaseOrderRequest request) {
         Company company = companyRepository.findById(companyId)
@@ -125,11 +134,7 @@ public class PurchaseOrderService {
 
     @Transactional
     public PurchaseOrder update(Long companyId, Long purchaseOrderId, UpdatePurchaseOrderRequest request) {
-        PurchaseOrder po = purchaseOrderRepository.findById(purchaseOrderId)
-                .orElseThrow(() -> new IllegalArgumentException("Purchase Order not found"));
-        if (po.getCompany() == null || po.getCompany().getId() == null || !po.getCompany().getId().equals(companyId)) {
-            throw new IllegalArgumentException("Purchase Order company mismatch");
-        }
+        PurchaseOrder po = get(companyId, purchaseOrderId);
         if (po.getStatus() != DocumentStatus.DRAFTED) {
             throw new IllegalArgumentException("Only DRAFTED Purchase Order can be updated");
         }
@@ -187,14 +192,22 @@ public class PurchaseOrderService {
 
     @Transactional
     public void delete(Long companyId, Long purchaseOrderId) {
-        PurchaseOrder po = purchaseOrderRepository.findById(purchaseOrderId)
-                .orElseThrow(() -> new IllegalArgumentException("Purchase Order not found"));
-        if (po.getCompany() == null || po.getCompany().getId() == null || !po.getCompany().getId().equals(companyId)) {
-            throw new IllegalArgumentException("Purchase Order company mismatch");
-        }
+        PurchaseOrder po = get(companyId, purchaseOrderId);
         if (po.getStatus() != DocumentStatus.DRAFTED) {
             throw new IllegalArgumentException("Only DRAFTED Purchase Order can be deleted");
         }
         purchaseOrderRepository.delete(po);
+    }
+
+    @Transactional
+    public PurchaseOrder approve(Long companyId, Long purchaseOrderId) {
+        PurchaseOrder po = get(companyId, purchaseOrderId);
+
+        if (po.getStatus() != DocumentStatus.DRAFTED) {
+            throw new IllegalArgumentException("Only DRAFTED Purchase Order can be approved");
+        }
+
+        po.setStatus(DocumentStatus.APPROVED);
+        return purchaseOrderRepository.save(po);
     }
 }

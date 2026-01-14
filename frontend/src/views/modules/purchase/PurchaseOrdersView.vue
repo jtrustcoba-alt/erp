@@ -22,8 +22,12 @@
         <el-table-column prop="status" label="Status" width="140" />
         <el-table-column prop="orderDate" label="Order Date" width="140" />
         <el-table-column prop="grandTotal" label="Grand Total" width="140" />
-        <el-table-column label="Action" width="180">
+        <el-table-column label="Action" width="260">
           <template #default="scope">
+            <el-button size="small" type="success" :disabled="!canApproveRow(scope.row)" @click="onApprove(scope.row)">Approve</el-button>
+            <el-button size="small" type="primary" plain :disabled="!canReceiptRow(scope.row)" @click="openGoodsReceipt(scope.row)">
+              Goods Receipt
+            </el-button>
             <el-button size="small" @click="openEdit(scope.row)" :disabled="!canEditRow(scope.row)">Edit</el-button>
             <el-button type="danger" size="small" plain @click="onDelete(scope.row)" :disabled="!canEditRow(scope.row)">Delete</el-button>
           </template>
@@ -103,13 +107,67 @@
         <el-button type="primary" :loading="saving" :disabled="!canSave" @click="save">Save</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="receiptOpen" title="Goods Receipt" width="980px">
+      <el-form label-position="top">
+        <el-alert v-if="!ctx.companyId" title="Pilih company dulu." type="warning" show-icon style="margin-bottom: 12px" />
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px">
+          <el-form-item label="To Locator">
+            <el-select v-model="receiptForm.toLocatorId" filterable placeholder="Select locator" style="width: 100%" :disabled="locators.length === 0">
+              <el-option v-for="l in locators" :key="l.id" :label="`${l.code} - ${l.name}`" :value="l.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Receipt Date">
+            <el-date-picker v-model="receiptForm.movementDate" type="date" value-format="YYYY-MM-DD" style="width: 220px" />
+          </el-form-item>
+          <el-form-item label="Description">
+            <el-input v-model="receiptForm.description" placeholder="optional" />
+          </el-form-item>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin: 12px 0 6px">
+          <div style="font-weight: 600">Lines</div>
+        </div>
+
+        <el-table :data="receiptForm.lines" size="small" style="width: 100%">
+          <el-table-column label="Product" min-width="320">
+            <template #default="scope">
+              <span>{{ productLabelById(scope.row.productId) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="Ordered" width="140">
+            <template #default="scope">
+              <span>{{ scope.row.orderedQty }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="Received" width="140">
+            <template #default="scope">
+              <span>{{ scope.row.receivedQty }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="Receive Qty" width="180">
+            <template #default="scope">
+              <el-input v-model="scope.row.qty" placeholder="e.g. 1" />
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <el-alert v-if="locators.length === 0" title="Locator belum ada. Buat Locator dulu di Inventory > Locators." type="warning" show-icon style="margin-top: 12px" />
+      </el-form>
+
+      <template #footer>
+        <el-button @click="receiptOpen = false">Cancel</el-button>
+        <el-button type="primary" :loading="receiptSaving" :disabled="!canReceiptSave" @click="submitGoodsReceipt">Submit</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { masterDataApi, purchaseApi } from '@/utils/api'
+import { inventoryApi, masterDataApi, purchaseApi } from '@/utils/api'
 import { useContextStore } from '@/stores/context'
 import CompanyOrgBar from '@/views/modules/common/CompanyOrgBar.vue'
 
@@ -124,8 +182,14 @@ const priceLists = ref([])
 const priceListVersions = ref([])
 const productPrices = ref([])
 
+const locators = ref([])
+
 const createOpen = ref(false)
 const saving = ref(false)
+
+const receiptOpen = ref(false)
+const receiptSaving = ref(false)
+const receiptPoId = ref(null)
 
 const editMode = ref('create')
 const editingId = ref(null)
@@ -138,6 +202,27 @@ const form = reactive({
   priceListVersionId: null,
   orderDate: '',
   lines: []
+})
+
+const receiptForm = reactive({
+  toLocatorId: null,
+  movementDate: '',
+  description: '',
+  lines: []
+})
+
+const canReceiptSave = computed(() => {
+  if (!ctx.companyId) return false
+  if (!receiptPoId.value) return false
+  if (!receiptForm.toLocatorId) return false
+  if (!receiptForm.movementDate) return false
+  if (!Array.isArray(receiptForm.lines) || receiptForm.lines.length === 0) return false
+  return receiptForm.lines.some((l) => {
+    const qty = Number(l.qty)
+    if (!Number.isFinite(qty) || qty <= 0) return false
+    const remaining = Math.max(0, Number(l.orderedQty ?? 0) - Number(l.receivedQty ?? 0))
+    return qty <= remaining
+  })
 })
 
 const canSave = computed(() => {
@@ -182,6 +267,7 @@ async function loadLookups() {
     priceLists.value = []
     priceListVersions.value = []
     productPrices.value = []
+    locators.value = []
     return
   }
 
@@ -200,6 +286,8 @@ async function loadLookups() {
 
   const plvId = priceListVersions.value[0]?.id
   productPrices.value = plvId ? await masterDataApi.listProductPrices(plvId) : []
+
+  locators.value = await inventoryApi.listLocators(ctx.companyId)
 }
 
 async function load() {
@@ -248,6 +336,99 @@ async function openEdit(row) {
 
 function canEditRow(row) {
   return !!ctx.companyId && row?.status === 'DRAFTED'
+}
+
+function canApproveRow(row) {
+  return !!ctx.companyId && row?.status === 'DRAFTED'
+}
+
+function canReceiptRow(row) {
+  return !!ctx.companyId && (row?.status === 'APPROVED' || row?.status === 'PARTIALLY_COMPLETED')
+}
+
+function productLabelById(productId) {
+  const p = (products.value || []).find((x) => x.id === productId)
+  return p ? `${p.code} - ${p.name}` : String(productId ?? '')
+}
+
+function openGoodsReceipt(row) {
+  if (!row?.id) return
+  receiptPoId.value = row.id
+  receiptForm.toLocatorId = locators.value[0]?.id || null
+  receiptForm.movementDate = new Date().toISOString().slice(0, 10)
+  receiptForm.description = `Goods Receipt for PO ${row.documentNo}`
+  receiptForm.lines = (row.lines || []).map((l) => {
+    const ordered = Number(l.qty ?? 0)
+    const received = Number(l.receivedQty ?? 0)
+    const remaining = Math.max(0, ordered - received)
+    return {
+      purchaseOrderLineId: l.id,
+      productId: l.productId,
+      orderedQty: ordered,
+      receivedQty: received,
+      qty: remaining > 0 ? String(remaining) : '0'
+    }
+  })
+  receiptOpen.value = true
+}
+
+async function submitGoodsReceipt() {
+  if (!receiptPoId.value) return
+  receiptSaving.value = true
+  try {
+    const invalid = (receiptForm.lines || []).find((l) => {
+      const qty = Number(l.qty)
+      if (!Number.isFinite(qty) || qty <= 0) return false
+      const remaining = Math.max(0, Number(l.orderedQty ?? 0) - Number(l.receivedQty ?? 0))
+      return qty > remaining
+    })
+    if (invalid) {
+      const remaining = Math.max(0, Number(invalid.orderedQty ?? 0) - Number(invalid.receivedQty ?? 0))
+      throw new Error(`Receive qty exceeds remaining qty (remaining=${remaining})`)
+    }
+
+    const lines = (receiptForm.lines || [])
+      .map((l) => ({
+        purchaseOrderLineId: l.purchaseOrderLineId,
+        qty: l.qty
+      }))
+      .filter((l) => {
+        const qty = Number(l.qty)
+        return Number.isFinite(qty) && qty > 0
+      })
+
+    await purchaseApi.createGoodsReceipt(ctx.companyId, receiptPoId.value, {
+      toLocatorId: receiptForm.toLocatorId,
+      movementDate: receiptForm.movementDate,
+      description: receiptForm.description,
+      lines
+    })
+
+    ElMessage.success('Goods Receipt created')
+    receiptOpen.value = false
+    await load()
+  } catch (e) {
+    ElMessage.error(e?.response?.data?.message || e?.message || 'Failed')
+  } finally {
+    receiptSaving.value = false
+  }
+}
+
+async function onApprove(row) {
+  if (!row?.id) return
+  try {
+    await ElMessageBox.confirm(`Approve Purchase Order "${row.documentNo}"?`, 'Confirm', {
+      type: 'warning',
+      confirmButtonText: 'Approve',
+      cancelButtonText: 'Cancel'
+    })
+    await purchaseApi.approvePurchaseOrder(ctx.companyId, row.id)
+    ElMessage.success('Purchase Order approved')
+    await load()
+  } catch (e) {
+    if (e === 'cancel' || e === 'close') return
+    ElMessage.error(e?.response?.data?.message || e?.message || 'Failed')
+  }
 }
 
 watch(
