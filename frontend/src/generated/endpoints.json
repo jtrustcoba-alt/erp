@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-01-13T02:41:45.403Z",
+  "generatedAt": "2026-01-13T09:16:22.443Z",
   "controllers": [
     {
       "name": "AdminController",
@@ -649,6 +649,16 @@
           "method": "POST",
           "path": "/api/manufacturing/companies/{companyId}/boms",
           "handler": "create"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/manufacturing/companies/{companyId}/boms/{bomId}",
+          "handler": "update"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/manufacturing/companies/{companyId}/boms/{bomId}",
+          "handler": "delete"
         }
       ]
     },
@@ -696,6 +706,16 @@
           "method": "POST",
           "path": "/api/manufacturing/companies/{companyId}/work-orders",
           "handler": "create"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/manufacturing/companies/{companyId}/work-orders/{workOrderId}",
+          "handler": "update"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/manufacturing/companies/{companyId}/work-orders/{workOrderId}",
+          "handler": "delete"
         }
       ]
     },
@@ -712,6 +732,16 @@
           "method": "POST",
           "path": "/api/masterdata/companies/{companyId}/business-partners",
           "handler": "create"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/masterdata/companies/{companyId}/business-partners/{businessPartnerId}",
+          "handler": "update"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/masterdata/companies/{companyId}/business-partners/{businessPartnerId}",
+          "handler": "delete"
         }
       ]
     },
@@ -728,6 +758,16 @@
           "method": "POST",
           "path": "/api/masterdata/companies/{companyId}/currencies",
           "handler": "create"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/masterdata/companies/{companyId}/currencies/{currencyId}",
+          "handler": "update"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/masterdata/companies/{companyId}/currencies/{currencyId}",
+          "handler": "delete"
         }
       ]
     },
@@ -744,6 +784,16 @@
           "method": "POST",
           "path": "/api/masterdata/companies/{companyId}/price-lists",
           "handler": "create"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/masterdata/companies/{companyId}/price-lists/{priceListId}",
+          "handler": "update"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/masterdata/companies/{companyId}/price-lists/{priceListId}",
+          "handler": "delete"
         }
       ]
     },
@@ -776,6 +826,16 @@
           "method": "POST",
           "path": "/api/masterdata/companies/{companyId}/products",
           "handler": "create"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/masterdata/companies/{companyId}/products/{productId}",
+          "handler": "update"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/masterdata/companies/{companyId}/products/{productId}",
+          "handler": "delete"
         }
       ]
     },
@@ -824,6 +884,16 @@
           "method": "POST",
           "path": "/api/masterdata/companies/{companyId}/uoms",
           "handler": "create"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/masterdata/companies/{companyId}/uoms/{uomId}",
+          "handler": "update"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/masterdata/companies/{companyId}/uoms/{uomId}",
+          "handler": "delete"
         }
       ]
     },
@@ -840,6 +910,16 @@
           "method": "POST",
           "path": "/api/masterdata/companies/{companyId}/warehouses",
           "handler": "create"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/masterdata/companies/{companyId}/warehouses/{warehouseId}",
+          "handler": "update"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/masterdata/companies/{companyId}/warehouses/{warehouseId}",
+          "handler": "delete"
         }
       ]
     },
@@ -867,6 +947,16 @@
           "method": "POST",
           "path": "/api/purchase/companies/{companyId}/purchase-orders",
           "handler": "create"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/purchase/companies/{companyId}/purchase-orders/{purchaseOrderId}",
+          "handler": "update"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/purchase/companies/{companyId}/purchase-orders/{purchaseOrderId}",
+          "handler": "delete"
         }
       ]
     },
@@ -894,6 +984,16 @@
           "method": "POST",
           "path": "/api/sales/companies/{companyId}/sales-orders",
           "handler": "create"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/sales/companies/{companyId}/sales-orders/{salesOrderId}",
+          "handler": "update"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/sales/companies/{companyId}/sales-orders/{salesOrderId}",
+          "handler": "delete"
         }
       ]
     }

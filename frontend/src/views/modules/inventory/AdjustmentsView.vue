@@ -24,6 +24,10 @@
         <el-table-column prop="description" label="Description" />
         <el-table-column label="Actions" width="220">
           <template #default="scope">
+            <el-button size="small" :disabled="scope.row.status !== 'DRAFTED'" @click="openEdit(scope.row)">Edit</el-button>
+            <el-button size="small" type="danger" plain :disabled="scope.row.status !== 'DRAFTED'" @click="onDelete(scope.row)"
+              >Delete</el-button
+            >
             <el-button size="small" type="success" :disabled="scope.row.status !== 'DRAFTED'" @click="complete(scope.row)">Complete</el-button>
             <el-button size="small" type="danger" plain :disabled="scope.row.status === 'VOIDED'" @click="voidAdj(scope.row)">Void</el-button>
           </template>
@@ -31,7 +35,7 @@
       </el-table>
     </el-card>
 
-    <el-dialog v-model="createOpen" title="Create Inventory Adjustment" width="980px">
+    <el-dialog v-model="createOpen" :title="dialogTitle" width="980px">
       <el-form label-position="top">
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px">
           <el-form-item label="Adjustment Date">
@@ -101,7 +105,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { inventoryApi, masterDataApi } from '@/utils/api'
 import { useContextStore } from '@/stores/context'
 import CompanyOrgBar from '@/views/modules/common/CompanyOrgBar.vue'
@@ -116,6 +120,11 @@ const locators = ref([])
 
 const createOpen = ref(false)
 const saving = ref(false)
+
+const editMode = ref('create')
+const editingId = ref(null)
+
+const dialogTitle = computed(() => (editMode.value === 'edit' ? 'Edit Inventory Adjustment' : 'Create Inventory Adjustment'))
 
 const form = reactive({
   adjustmentDate: '',
@@ -178,6 +187,8 @@ async function load() {
 }
 
 function openCreate() {
+  editMode.value = 'create'
+  editingId.value = null
   form.adjustmentDate = new Date().toISOString().slice(0, 10)
   form.orgId = ctx.orgId
   form.description = ''
@@ -186,12 +197,30 @@ function openCreate() {
   createOpen.value = true
 }
 
+function openEdit(row) {
+  if (!row?.id) return
+  editMode.value = 'edit'
+  editingId.value = row.id
+  form.adjustmentDate = row.adjustmentDate || new Date().toISOString().slice(0, 10)
+  form.orgId = row.orgId || null
+  form.description = row.description || ''
+  form.lines = (row.lines || []).map((l) => ({
+    productId: l.productId,
+    locatorId: l.locatorId,
+    quantityAdjusted: String(l.quantityAdjusted ?? ''),
+    adjustmentAmount: String(l.adjustmentAmount ?? ''),
+    notes: l.notes || ''
+  }))
+  if (form.lines.length === 0) addLine()
+  createOpen.value = true
+}
+
 async function save() {
   saving.value = true
   try {
-    await inventoryApi.createAdjustment(ctx.companyId, {
+    const payload = {
       adjustmentDate: form.adjustmentDate,
-      orgId: ctx.orgId || null,
+      orgId: form.orgId || null,
       description: form.description,
       lines: form.lines.map((l) => ({
         productId: l.productId,
@@ -200,14 +229,38 @@ async function save() {
         adjustmentAmount: l.adjustmentAmount,
         notes: l.notes
       }))
-    })
-    ElMessage.success('Adjustment created')
+    }
+
+    if (editMode.value === 'edit' && editingId.value) {
+      await inventoryApi.updateAdjustment(ctx.companyId, editingId.value, payload)
+      ElMessage.success('Adjustment updated')
+    } else {
+      await inventoryApi.createAdjustment(ctx.companyId, payload)
+      ElMessage.success('Adjustment created')
+    }
     createOpen.value = false
     await load()
   } catch (e) {
     ElMessage.error(e?.response?.data?.message || e?.message || 'Failed')
   } finally {
     saving.value = false
+  }
+}
+
+async function onDelete(row) {
+  if (!row?.id) return
+  try {
+    await ElMessageBox.confirm(`Delete Adjustment "${row.documentNo}"?`, 'Confirm', {
+      type: 'warning',
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel'
+    })
+    await inventoryApi.deleteAdjustment(ctx.companyId, row.id)
+    ElMessage.success('Adjustment deleted')
+    await load()
+  } catch (e) {
+    if (e === 'cancel' || e === 'close') return
+    ElMessage.error(e?.response?.data?.message || e?.message || 'Failed')
   }
 }
 

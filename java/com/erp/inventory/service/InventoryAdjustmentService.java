@@ -32,6 +32,7 @@ import com.erp.inventory.repository.InventoryAdjustmentRepository;
 import com.erp.inventory.repository.InventoryOnHandRepository;
 import com.erp.inventory.repository.LocatorRepository;
 import com.erp.inventory.request.CreateInventoryAdjustmentRequest;
+import com.erp.inventory.request.UpdateInventoryAdjustmentRequest;
 import com.erp.masterdata.entity.Product;
 import com.erp.masterdata.repository.ProductRepository;
 
@@ -79,6 +80,30 @@ public class InventoryAdjustmentService {
         return inventoryAdjustmentRepository.findByCompanyId(companyId);
     }
 
+    public InventoryAdjustment get(Long companyId, Long adjustmentId) {
+        InventoryAdjustment adj = inventoryAdjustmentRepository.findById(adjustmentId)
+                .orElseThrow(() -> new IllegalArgumentException("InventoryAdjustment not found"));
+
+        if (adj.getCompany() == null || adj.getCompany().getId() == null || !adj.getCompany().getId().equals(companyId)) {
+            throw new IllegalArgumentException("Company mismatch");
+        }
+
+        return adj;
+    }
+
+    private InventoryOnHand getOrCreateOnHand(Long companyId, Company company, Product product, Locator locator) {
+        return inventoryOnHandRepository
+                .findByCompanyIdAndProductIdAndLocatorId(companyId, product.getId(), locator.getId())
+                .orElseGet(() -> {
+                    InventoryOnHand created = new InventoryOnHand();
+                    created.setCompany(company);
+                    created.setProduct(product);
+                    created.setLocator(locator);
+                    created.setQuantityOnHand(BigDecimal.ZERO);
+                    return inventoryOnHandRepository.save(created);
+                });
+    }
+
     @Transactional
     public InventoryAdjustment create(Long companyId, CreateInventoryAdjustmentRequest request) {
         Company company = companyRepository.findById(companyId)
@@ -103,12 +128,18 @@ public class InventoryAdjustmentService {
             Product product = productRepository.findById(lineReq.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
+            if (product.getCompany() == null || product.getCompany().getId() == null || !product.getCompany().getId().equals(companyId)) {
+                throw new IllegalArgumentException("Product company mismatch");
+            }
+
             Locator locator = locatorRepository.findById(lineReq.getLocatorId())
                     .orElseThrow(() -> new IllegalArgumentException("Locator not found"));
 
-            InventoryOnHand onHand = inventoryOnHandRepository
-                    .findByCompanyIdAndProductIdAndLocatorId(companyId, lineReq.getProductId(), lineReq.getLocatorId())
-                    .orElseThrow(() -> new IllegalArgumentException("On-hand record not found"));
+            if (locator.getCompany() == null || locator.getCompany().getId() == null || !locator.getCompany().getId().equals(companyId)) {
+                throw new IllegalArgumentException("Locator company mismatch");
+            }
+
+            InventoryOnHand onHand = getOrCreateOnHand(companyId, company, product, locator);
 
             BigDecimal qtyBefore = onHand.getQuantityOnHand();
             BigDecimal qtyAdjusted = lineReq.getQuantityAdjusted();
@@ -132,6 +163,73 @@ public class InventoryAdjustmentService {
     }
 
     @Transactional
+    public InventoryAdjustment update(Long companyId, Long adjustmentId, UpdateInventoryAdjustmentRequest request) {
+        InventoryAdjustment adj = get(companyId, adjustmentId);
+
+        if (adj.getStatus() != DocumentStatus.DRAFTED) {
+            throw new IllegalArgumentException("Only DRAFTED adjustments can be updated");
+        }
+
+        Org org = null;
+        if (request.getOrgId() != null) {
+            org = orgRepository.findById(request.getOrgId())
+                    .orElseThrow(() -> new IllegalArgumentException("Org not found"));
+        }
+
+        adj.setOrg(org);
+        adj.setAdjustmentDate(request.getAdjustmentDate());
+        adj.setDescription(request.getDescription());
+
+        // orphanRemoval safe update
+        adj.getLines().clear();
+
+        for (UpdateInventoryAdjustmentRequest.UpdateInventoryAdjustmentLineRequest lineReq : request.getLines()) {
+            Product product = productRepository.findById(lineReq.getProductId())
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+            if (product.getCompany() == null || product.getCompany().getId() == null || !product.getCompany().getId().equals(companyId)) {
+                throw new IllegalArgumentException("Product company mismatch");
+            }
+
+            Locator locator = locatorRepository.findById(lineReq.getLocatorId())
+                    .orElseThrow(() -> new IllegalArgumentException("Locator not found"));
+
+            if (locator.getCompany() == null || locator.getCompany().getId() == null || !locator.getCompany().getId().equals(companyId)) {
+                throw new IllegalArgumentException("Locator company mismatch");
+            }
+
+            InventoryOnHand onHand = getOrCreateOnHand(companyId, adj.getCompany(), product, locator);
+            BigDecimal qtyBefore = onHand.getQuantityOnHand();
+            BigDecimal qtyAdjusted = lineReq.getQuantityAdjusted();
+            BigDecimal qtyAfter = qtyBefore.add(qtyAdjusted);
+
+            InventoryAdjustmentLine line = new InventoryAdjustmentLine();
+            line.setAdjustment(adj);
+            line.setProduct(product);
+            line.setLocator(locator);
+            line.setQuantityOnHandBefore(qtyBefore);
+            line.setQuantityAdjusted(qtyAdjusted);
+            line.setQuantityOnHandAfter(qtyAfter);
+            line.setAdjustmentAmount(lineReq.getAdjustmentAmount());
+            line.setNotes(lineReq.getNotes());
+            adj.getLines().add(line);
+        }
+
+        return inventoryAdjustmentRepository.save(adj);
+    }
+
+    @Transactional
+    public void delete(Long companyId, Long adjustmentId) {
+        InventoryAdjustment adj = get(companyId, adjustmentId);
+
+        if (adj.getStatus() != DocumentStatus.DRAFTED) {
+            throw new IllegalArgumentException("Only DRAFTED adjustments can be deleted");
+        }
+
+        inventoryAdjustmentRepository.delete(adj);
+    }
+
+    @Transactional
     public InventoryAdjustment complete(Long companyId, Long adjustmentId) {
         InventoryAdjustment adj = inventoryAdjustmentRepository.findById(adjustmentId)
                 .orElseThrow(() -> new IllegalArgumentException("InventoryAdjustment not found"));
@@ -146,9 +244,7 @@ public class InventoryAdjustmentService {
 
         // Update on-hand stock
         for (InventoryAdjustmentLine line : adj.getLines()) {
-            InventoryOnHand onHand = inventoryOnHandRepository
-                    .findByCompanyIdAndProductIdAndLocatorId(companyId, line.getProduct().getId(), line.getLocator().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("On-hand not found"));
+            InventoryOnHand onHand = getOrCreateOnHand(companyId, adj.getCompany(), line.getProduct(), line.getLocator());
             onHand.setQuantityOnHand(line.getQuantityOnHandAfter());
             inventoryOnHandRepository.save(onHand);
         }
@@ -231,9 +327,7 @@ public class InventoryAdjustmentService {
         if (adj.getStatus() == DocumentStatus.COMPLETED) {
             // Reverse on-hand
             for (InventoryAdjustmentLine line : adj.getLines()) {
-                InventoryOnHand onHand = inventoryOnHandRepository
-                        .findByCompanyIdAndProductIdAndLocatorId(companyId, line.getProduct().getId(), line.getLocator().getId())
-                        .orElseThrow(() -> new IllegalArgumentException("On-hand not found"));
+                InventoryOnHand onHand = getOrCreateOnHand(companyId, adj.getCompany(), line.getProduct(), line.getLocator());
                 onHand.setQuantityOnHand(line.getQuantityOnHandBefore());
                 inventoryOnHandRepository.save(onHand);
             }

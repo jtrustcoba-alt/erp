@@ -83,6 +83,10 @@ export const inventoryApi = {
 
   listAdjustments: (companyId) => http.get(`/api/inventory/companies/${companyId}/adjustments`).then((r) => r.data),
   createAdjustment: (companyId, payload) => http.post(`/api/inventory/companies/${companyId}/adjustments`, payload).then((r) => r.data),
+  updateAdjustment: (companyId, adjustmentId, payload) =>
+    http.put(`/api/inventory/companies/${companyId}/adjustments/${adjustmentId}`, payload).then((r) => r.data),
+  deleteAdjustment: (companyId, adjustmentId) =>
+    http.delete(`/api/inventory/companies/${companyId}/adjustments/${adjustmentId}`).then((r) => r.data),
   completeAdjustment: (companyId, adjustmentId) =>
     http.post(`/api/inventory/companies/${companyId}/adjustments/${adjustmentId}/complete`).then((r) => r.data),
   voidAdjustment: (companyId, adjustmentId) => http.post(`/api/inventory/companies/${companyId}/adjustments/${adjustmentId}/void`).then((r) => r.data)
