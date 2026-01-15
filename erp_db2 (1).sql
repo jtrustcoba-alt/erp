@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 14, 2026 at 10:44 AM
+-- Generation Time: Jan 15, 2026 at 10:08 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -138,11 +138,11 @@ CREATE TABLE `core_document_sequence` (
 
 INSERT INTO `core_document_sequence` (`id`, `created_at`, `created_by`, `updated_at`, `updated_by`, `document_type`, `next_number`, `padding`, `prefix`, `company_id`) VALUES
 (7, '2026-01-12 07:48:31.000000', 'admin@test.com', '2026-01-14 02:12:42.000000', 'admin@test.com', 'PURCHASE_ORDER', 4, 5, 'PO-', 1),
-(8, '2026-01-12 07:49:20.000000', 'admin@test.com', '2026-01-13 02:47:14.000000', 'admin@test.com', 'SALES_ORDER', 3, 5, 'SO-', 1),
-(9, '2026-01-12 08:44:41.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 'INVENTORY_MOVEMENT', 3, 5, 'MM-', 1),
+(8, '2026-01-12 07:49:20.000000', 'admin@test.com', '2026-01-15 09:08:06.000000', 'admin@test.com', 'SALES_ORDER', 7, 5, 'SO-', 1),
+(9, '2026-01-12 08:44:41.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 'admin@test.com', 'INVENTORY_MOVEMENT', 4, 5, 'MM-', 1),
 (12, '2026-01-13 03:55:23.000000', 'admin@test.com', '2026-01-13 03:55:23.000000', 'admin@test.com', 'WORK_ORDER', 2, 5, 'WO-', 1),
 (16, '2026-01-14 04:03:59.000000', 'admin@test.com', '2026-01-14 04:16:39.000000', 'admin@test.com', 'INVENTORY_ADJUSTMENT', 3, 5, 'IA-', 1),
-(19, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 'JOURNAL_ENTRY', 2, 5, 'JE-', 1);
+(19, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 'admin@test.com', 'JOURNAL_ENTRY', 3, 5, 'JE-', 1);
 
 -- --------------------------------------------------------
 
@@ -541,7 +541,8 @@ CREATE TABLE `fin_journal_entry` (
 --
 
 INSERT INTO `fin_journal_entry` (`id`, `created_at`, `created_by`, `updated_at`, `updated_by`, `accounting_date`, `description`, `document_no`, `status`, `company_id`, `org_id`, `source_document_type`, `source_document_no`, `accounting_period_id`) VALUES
-(3, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14', 'Goods Receipt for PO PO-00002', 'JE-00001', 'COMPLETED', 1, NULL, 'INVENTORY_MOVEMENT', 'MM-00002', 1);
+(3, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14', 'Goods Receipt for PO PO-00002', 'JE-00001', 'COMPLETED', 1, NULL, 'INVENTORY_MOVEMENT', 'MM-00002', 1),
+(4, '2026-01-14 09:52:12.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 'admin@test.com', '2026-01-14', 'Goods Receipt for PO PO-00003', 'JE-00002', 'COMPLETED', 1, 1, 'INVENTORY_MOVEMENT', 'MM-00003', 1);
 
 -- --------------------------------------------------------
 
@@ -568,7 +569,9 @@ CREATE TABLE `fin_journal_line` (
 
 INSERT INTO `fin_journal_line` (`id`, `created_at`, `created_by`, `updated_at`, `updated_by`, `account_code`, `credit`, `debit`, `journal_entry_id`, `gl_account_id`) VALUES
 (1, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 'INVENTORY', 0.00, 25000.00, 3, 7),
-(2, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 'AP', 25000.00, 0.00, 3, 8);
+(2, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 'AP', 25000.00, 0.00, 3, 8),
+(3, '2026-01-14 09:52:12.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 'admin@test.com', 'INVENTORY', 0.00, 2001000.00, 4, 7),
+(4, '2026-01-14 09:52:12.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 'admin@test.com', 'AP', 2001000.00, 0.00, 4, 8);
 
 -- --------------------------------------------------------
 
@@ -652,7 +655,11 @@ INSERT INTO `flyway_schema_history` (`installed_rank`, `version`, `description`,
 (16, '16', 'inv onhand', 'SQL', 'V16__inv_onhand.sql', -767320700, 'root', '2026-01-11 14:19:13', 110, 1),
 (17, '17', 'core document sequence document type varchar', 'SQL', 'V17__core_document_sequence_document_type_varchar.sql', 1464578643, 'root', '2026-01-12 09:30:33', 92, 1),
 (18, '18', 'trx purchase order status varchar', 'SQL', 'V18__trx_purchase_order_status_varchar.sql', -1277254289, 'root', '2026-01-14 09:21:47', 91, 1),
-(19, '19', 'fin journal line account code varchar', 'SQL', 'V19__fin_journal_line_account_code_varchar.sql', -1005011317, 'root', '2026-01-14 09:39:30', 66, 1);
+(19, '19', 'fin journal line account code varchar', 'SQL', 'V19__fin_journal_line_account_code_varchar.sql', -1005011317, 'root', '2026-01-14 09:39:30', 66, 1),
+(20, '20', 'trx sales order type', 'SQL', 'V20__trx_sales_order_type.sql', -1929488989, 'root', '2026-01-15 07:13:21', 32, 1),
+(21, '21', 'trx sales order domestic garment fields', 'SQL', 'V21__trx_sales_order_domestic_garment_fields.sql', 527384519, 'root', '2026-01-15 08:10:48', 69, 1),
+(22, '22', 'trx sales order export garment fields', 'SQL', 'V22__trx_sales_order_export_garment_fields.sql', -1358894440, 'root', '2026-01-15 08:40:59', 400, 1),
+(23, '23', 'trx sales order export item release fields', 'SQL', 'V23__trx_sales_order_export_item_release_fields.sql', -405290896, 'root', '2026-01-15 08:40:59', 15, 1);
 
 -- --------------------------------------------------------
 
@@ -766,7 +773,8 @@ CREATE TABLE `inv_movement` (
 
 INSERT INTO `inv_movement` (`id`, `created_at`, `created_by`, `updated_at`, `updated_by`, `description`, `document_no`, `movement_date`, `movement_type`, `status`, `company_id`) VALUES
 (1, '2026-01-12 08:44:41.000000', 'admin@test.com', '2026-01-12 08:44:41.000000', 'admin@test.com', '', 'MM-00001', '2026-01-12', 'IN', 'DRAFTED', 1),
-(4, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 'Goods Receipt for PO PO-00002', 'MM-00002', '2026-01-14', 'IN', 'DRAFTED', 1);
+(4, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 'Goods Receipt for PO PO-00002', 'MM-00002', '2026-01-14', 'IN', 'DRAFTED', 1),
+(5, '2026-01-14 09:52:12.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 'admin@test.com', 'Goods Receipt for PO PO-00003', 'MM-00003', '2026-01-14', 'IN', 'DRAFTED', 1);
 
 -- --------------------------------------------------------
 
@@ -795,7 +803,9 @@ INSERT INTO `inv_movement_line` (`id`, `created_at`, `created_by`, `updated_at`,
 (1, '2026-01-12 08:44:41.000000', 'admin@test.com', '2026-01-12 08:44:41.000000', 'admin@test.com', 1.00, 1, 1, 1, 1),
 (8, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 1.00, NULL, 4, 1, 1),
 (9, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 12.00, NULL, 4, 1, 1),
-(10, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 1.00, NULL, 4, 3, 1);
+(10, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 1.00, NULL, 4, 3, 1),
+(11, '2026-01-14 09:52:12.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 'admin@test.com', 10.00, NULL, 5, 6, 1),
+(12, '2026-01-14 09:52:12.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 'admin@test.com', 1.00, NULL, 5, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -851,7 +861,9 @@ INSERT INTO `inv_stock_txn` (`id`, `created_at`, `created_by`, `updated_at`, `up
 (1, '2026-01-12 08:44:41.000000', 'admin@test.com', '2026-01-12 08:44:41.000000', 'admin@test.com', '2026-01-12 08:44:41.000000', 1.00, 'MM-00001', 1, 1, 1),
 (8, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 1.00, 'MM-00002', 1, 1, 1),
 (9, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 12.00, 'MM-00002', 1, 1, 1),
-(10, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 1.00, 'MM-00002', 1, 1, 3);
+(10, '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 1.00, 'MM-00002', 1, 1, 3),
+(11, '2026-01-14 09:52:12.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 10.00, 'MM-00003', 1, 1, 6),
+(12, '2026-01-14 09:52:12.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 1.00, 'MM-00003', 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -1339,7 +1351,7 @@ CREATE TABLE `trx_purchase_order` (
 
 INSERT INTO `trx_purchase_order` (`id`, `created_at`, `created_by`, `updated_at`, `updated_by`, `document_no`, `grand_total`, `order_date`, `status`, `total_net`, `total_tax`, `company_id`, `org_id`, `price_list_version_id`, `vendor_id`) VALUES
 (2, '2026-01-13 07:53:26.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 'PO-00002', 25000.00, '2026-01-13', 'COMPLETED', 25000.00, 0.00, 1, NULL, 1, 3),
-(3, '2026-01-14 02:12:42.000000', 'admin@test.com', '2026-01-14 09:22:45.000000', 'admin@test.com', 'PO-00003', 2001000.00, '2026-01-14', 'APPROVED', 2001000.00, 0.00, 1, 1, 1, 1);
+(3, '2026-01-14 02:12:42.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 'admin@test.com', 'PO-00003', 2001000.00, '2026-01-14', 'COMPLETED', 2001000.00, 0.00, 1, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -1370,8 +1382,8 @@ INSERT INTO `trx_purchase_order_line` (`id`, `created_at`, `created_by`, `update
 (4, '2026-01-13 08:02:21.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 1000.00, 1000.00, 1.00, 1, 2, 2, 1.00),
 (5, '2026-01-13 08:02:22.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 12000.00, 1000.00, 12.00, 1, 2, 2, 12.00),
 (6, '2026-01-13 08:02:22.000000', 'admin@test.com', '2026-01-14 09:40:27.000000', 'admin@test.com', 12000.00, 12000.00, 1.00, 3, 2, 1, 1.00),
-(8, '2026-01-14 09:22:36.000000', 'admin@test.com', '2026-01-14 09:22:36.000000', 'admin@test.com', 2000000.00, 200000.00, 10.00, 6, 3, 1, 0.00),
-(9, '2026-01-14 09:22:36.000000', 'admin@test.com', '2026-01-14 09:22:36.000000', 'admin@test.com', 1000.00, 1000.00, 1.00, 1, 3, 2, 0.00);
+(8, '2026-01-14 09:22:36.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 'admin@test.com', 2000000.00, 200000.00, 10.00, 6, 3, 1, 10.00),
+(9, '2026-01-14 09:22:36.000000', 'admin@test.com', '2026-01-14 09:52:12.000000', 'admin@test.com', 1000.00, 1000.00, 1.00, 1, 3, 2, 1.00);
 
 -- --------------------------------------------------------
 
@@ -1394,15 +1406,50 @@ CREATE TABLE `trx_sales_order` (
   `business_partner_id` bigint(20) NOT NULL,
   `company_id` bigint(20) NOT NULL,
   `org_id` bigint(20) DEFAULT NULL,
-  `price_list_version_id` bigint(20) NOT NULL
+  `price_list_version_id` bigint(20) NOT NULL,
+  `order_type` varchar(16) NOT NULL DEFAULT 'DOMESTIC',
+  `buyer_po` varchar(255) DEFAULT NULL,
+  `department_id` bigint(20) DEFAULT NULL,
+  `employee_id` bigint(20) DEFAULT NULL,
+  `in_charge` varchar(255) DEFAULT NULL,
+  `payment_condition` varchar(255) DEFAULT NULL,
+  `delivery_place` varchar(255) DEFAULT NULL,
+  `forwarding_warehouse_id` bigint(20) DEFAULT NULL,
+  `memo` varchar(255) DEFAULT NULL,
+  `currency_id` bigint(20) DEFAULT NULL,
+  `exchange_rate` decimal(38,2) DEFAULT NULL,
+  `foreign_amount` decimal(38,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `trx_sales_order`
 --
 
-INSERT INTO `trx_sales_order` (`id`, `created_at`, `created_by`, `updated_at`, `updated_by`, `document_no`, `grand_total`, `order_date`, `status`, `total_net`, `total_tax`, `business_partner_id`, `company_id`, `org_id`, `price_list_version_id`) VALUES
-(2, '2026-01-13 02:47:14.000000', 'admin@test.com', '2026-01-13 07:52:47.000000', 'admin@test.com', 'SO-00002', 29000.00, '2026-01-13', 'DRAFTED', 29000.00, 0.00, 2, 1, NULL, 1);
+INSERT INTO `trx_sales_order` (`id`, `created_at`, `created_by`, `updated_at`, `updated_by`, `document_no`, `grand_total`, `order_date`, `status`, `total_net`, `total_tax`, `business_partner_id`, `company_id`, `org_id`, `price_list_version_id`, `order_type`, `buyer_po`, `department_id`, `employee_id`, `in_charge`, `payment_condition`, `delivery_place`, `forwarding_warehouse_id`, `memo`, `currency_id`, `exchange_rate`, `foreign_amount`) VALUES
+(3, '2026-01-15 07:15:26.000000', 'admin@test.com', '2026-01-15 07:15:26.000000', 'admin@test.com', 'SO-00003', 2000.00, '2026-01-15', 'DRAFTED', 2000.00, 0.00, 2, 1, 2, 1, 'DOMESTIC', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(4, '2026-01-15 08:13:13.000000', 'admin@test.com', '2026-01-15 08:13:13.000000', 'admin@test.com', 'SO-00004', 1100.00, '2026-01-15', 'DRAFTED', 1100.00, 0.00, 2, 1, 2, 1, 'DOMESTIC', NULL, 4, 2, NULL, NULL, NULL, 1, 'memo', NULL, NULL, NULL),
+(5, '2026-01-15 09:07:40.000000', 'admin@test.com', '2026-01-15 09:07:40.000000', 'admin@test.com', 'SO-00005', 1000.00, '2026-01-15', 'DRAFTED', 1000.00, 0.00, 2, 1, 2, 1, 'EXPORT', NULL, 1, 1, NULL, NULL, 'place', 1, NULL, 1, NULL, NULL),
+(6, '2026-01-15 09:08:06.000000', 'admin@test.com', '2026-01-15 09:08:06.000000', 'admin@test.com', 'SO-00006', 1000.00, '2026-01-15', 'DRAFTED', 1000.00, 0.00, 2, 1, 2, 1, 'EXPORT', NULL, 1, 1, NULL, NULL, NULL, 1, NULL, 1, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `trx_sales_order_delivery_schedule`
+--
+
+CREATE TABLE `trx_sales_order_delivery_schedule` (
+  `id` bigint(20) NOT NULL,
+  `created_at` datetime(6) DEFAULT NULL,
+  `updated_at` datetime(6) DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `updated_by` varchar(255) DEFAULT NULL,
+  `sales_order_id` bigint(20) NOT NULL,
+  `delivery_date` date DEFAULT NULL,
+  `ship_mode` varchar(255) DEFAULT NULL,
+  `factory` varchar(255) DEFAULT NULL,
+  `remark` varchar(255) DEFAULT NULL,
+  `file_path` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -1422,19 +1469,42 @@ CREATE TABLE `trx_sales_order_line` (
   `product_id` bigint(20) NOT NULL,
   `sales_order_id` bigint(20) NOT NULL,
   `uom_id` bigint(20) NOT NULL,
-  `shipped_qty` decimal(38,2) NOT NULL
+  `shipped_qty` decimal(38,2) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `unit` varchar(255) DEFAULT NULL,
+  `size` varchar(255) DEFAULT NULL,
+  `national_size` varchar(255) DEFAULT NULL,
+  `style` varchar(255) DEFAULT NULL,
+  `cutting_no` varchar(255) DEFAULT NULL,
+  `color` varchar(255) DEFAULT NULL,
+  `destination` varchar(255) DEFAULT NULL,
+  `supply_amount` decimal(38,2) DEFAULT NULL,
+  `vat_amount` decimal(38,2) DEFAULT NULL,
+  `fob_price` decimal(38,2) DEFAULT NULL,
+  `ldp_price` decimal(38,2) DEFAULT NULL,
+  `cmt_cost` decimal(38,2) DEFAULT NULL,
+  `cm_cost` decimal(38,2) DEFAULT NULL,
+  `fabric_eta` date DEFAULT NULL,
+  `fabric_etd` date DEFAULT NULL,
+  `dp_price` decimal(38,2) DEFAULT NULL,
+  `delivery_date` date DEFAULT NULL,
+  `ship_mode` varchar(255) DEFAULT NULL,
+  `factory` varchar(255) DEFAULT NULL,
+  `remark` varchar(255) DEFAULT NULL,
+  `file_path` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `trx_sales_order_line`
 --
 
-INSERT INTO `trx_sales_order_line` (`id`, `created_at`, `created_by`, `updated_at`, `updated_by`, `line_net`, `price`, `qty`, `product_id`, `sales_order_id`, `uom_id`, `shipped_qty`) VALUES
-(35, '2026-01-13 07:52:47.000000', 'admin@test.com', '2026-01-13 07:52:47.000000', 'admin@test.com', 1000.00, 1000.00, 1.00, 1, 2, 2, 0.00),
-(36, '2026-01-13 07:52:47.000000', 'admin@test.com', '2026-01-13 07:52:47.000000', 'admin@test.com', 2000.00, 2000.00, 1.00, 2, 2, 1, 0.00),
-(37, '2026-01-13 07:52:47.000000', 'admin@test.com', '2026-01-13 07:52:47.000000', 'admin@test.com', 24000.00, 12000.00, 2.00, 3, 2, 1, 0.00),
-(38, '2026-01-13 07:52:47.000000', 'admin@test.com', '2026-01-13 07:52:47.000000', 'admin@test.com', 1000.00, 1000.00, 1.00, 1, 2, 2, 0.00),
-(39, '2026-01-13 07:52:47.000000', 'admin@test.com', '2026-01-13 07:52:47.000000', 'admin@test.com', 1000.00, 1000.00, 1.00, 1, 2, 2, 0.00);
+INSERT INTO `trx_sales_order_line` (`id`, `created_at`, `created_by`, `updated_at`, `updated_by`, `line_net`, `price`, `qty`, `product_id`, `sales_order_id`, `uom_id`, `shipped_qty`, `description`, `unit`, `size`, `national_size`, `style`, `cutting_no`, `color`, `destination`, `supply_amount`, `vat_amount`, `fob_price`, `ldp_price`, `cmt_cost`, `cm_cost`, `fabric_eta`, `fabric_etd`, `dp_price`, `delivery_date`, `ship_mode`, `factory`, `remark`, `file_path`) VALUES
+(40, '2026-01-15 07:15:26.000000', 'admin@test.com', '2026-01-15 07:15:26.000000', 'admin@test.com', 1000.00, 1000.00, 1.00, 1, 3, 2, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(41, '2026-01-15 07:15:26.000000', 'admin@test.com', '2026-01-15 07:15:26.000000', 'admin@test.com', 1000.00, 1000.00, 1.00, 1, 3, 2, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(42, '2026-01-15 08:13:13.000000', 'admin@test.com', '2026-01-15 08:13:13.000000', 'admin@test.com', 1000.00, 1000.00, 1.00, 1, 4, 2, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(43, '2026-01-15 08:13:13.000000', 'admin@test.com', '2026-01-15 08:13:13.000000', 'admin@test.com', 100.00, 100.00, 1.00, 7, 4, 7, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(44, '2026-01-15 09:07:40.000000', 'admin@test.com', '2026-01-15 09:07:40.000000', 'admin@test.com', 1000.00, 1000.00, 1.00, 1, 5, 2, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(45, '2026-01-15 09:08:06.000000', 'admin@test.com', '2026-01-15 09:08:06.000000', 'admin@test.com', 1000.00, 1000.00, 1.00, 1, 6, 2, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1914,7 +1984,18 @@ ALTER TABLE `trx_sales_order`
   ADD KEY `FKpjnegga8t83kg6q37f9leqgr7` (`business_partner_id`),
   ADD KEY `FK5vtmle5kjjni4rks0knb97t3u` (`company_id`),
   ADD KEY `FKlg1w0td5jcgreo8v6o5541auw` (`org_id`),
-  ADD KEY `FK7atiiaf46bylnk9v0idp8w6eb` (`price_list_version_id`);
+  ADD KEY `FK7atiiaf46bylnk9v0idp8w6eb` (`price_list_version_id`),
+  ADD KEY `FKoitm0dh0r6cusea2qm0a92j2r` (`department_id`),
+  ADD KEY `FKkbmqo7mbaxjcjij8m3ey40d2n` (`employee_id`),
+  ADD KEY `FKdogv0h7k1h4pbq9k2fq8uj09o` (`forwarding_warehouse_id`),
+  ADD KEY `fk_trx_sales_order_currency` (`currency_id`);
+
+--
+-- Indexes for table `trx_sales_order_delivery_schedule`
+--
+ALTER TABLE `trx_sales_order_delivery_schedule`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_trx_so_sched_so` (`sales_order_id`);
 
 --
 -- Indexes for table `trx_sales_order_line`
@@ -2049,13 +2130,13 @@ ALTER TABLE `fin_invoice_tax_line`
 -- AUTO_INCREMENT for table `fin_journal_entry`
 --
 ALTER TABLE `fin_journal_entry`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `fin_journal_line`
 --
 ALTER TABLE `fin_journal_line`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `fin_payment`
@@ -2091,13 +2172,13 @@ ALTER TABLE `inv_locator`
 -- AUTO_INCREMENT for table `inv_movement`
 --
 ALTER TABLE `inv_movement`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `inv_movement_line`
 --
 ALTER TABLE `inv_movement_line`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `inv_onhand`
@@ -2109,7 +2190,7 @@ ALTER TABLE `inv_onhand`
 -- AUTO_INCREMENT for table `inv_stock_txn`
 --
 ALTER TABLE `inv_stock_txn`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `leaves`
@@ -2229,13 +2310,19 @@ ALTER TABLE `trx_purchase_order_line`
 -- AUTO_INCREMENT for table `trx_sales_order`
 --
 ALTER TABLE `trx_sales_order`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `trx_sales_order_delivery_schedule`
+--
+ALTER TABLE `trx_sales_order_delivery_schedule`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `trx_sales_order_line`
 --
 ALTER TABLE `trx_sales_order_line`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- Constraints for dumped tables
@@ -2586,8 +2673,18 @@ ALTER TABLE `trx_purchase_order_line`
 ALTER TABLE `trx_sales_order`
   ADD CONSTRAINT `FK5vtmle5kjjni4rks0knb97t3u` FOREIGN KEY (`company_id`) REFERENCES `core_company` (`id`),
   ADD CONSTRAINT `FK7atiiaf46bylnk9v0idp8w6eb` FOREIGN KEY (`price_list_version_id`) REFERENCES `md_price_list_version` (`id`),
+  ADD CONSTRAINT `FKdogv0h7k1h4pbq9k2fq8uj09o` FOREIGN KEY (`forwarding_warehouse_id`) REFERENCES `md_warehouse` (`id`),
+  ADD CONSTRAINT `FKkbmqo7mbaxjcjij8m3ey40d2n` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`),
   ADD CONSTRAINT `FKlg1w0td5jcgreo8v6o5541auw` FOREIGN KEY (`org_id`) REFERENCES `core_org` (`id`),
-  ADD CONSTRAINT `FKpjnegga8t83kg6q37f9leqgr7` FOREIGN KEY (`business_partner_id`) REFERENCES `md_business_partner` (`id`);
+  ADD CONSTRAINT `FKoitm0dh0r6cusea2qm0a92j2r` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`),
+  ADD CONSTRAINT `FKpjnegga8t83kg6q37f9leqgr7` FOREIGN KEY (`business_partner_id`) REFERENCES `md_business_partner` (`id`),
+  ADD CONSTRAINT `fk_trx_sales_order_currency` FOREIGN KEY (`currency_id`) REFERENCES `md_currency` (`id`);
+
+--
+-- Constraints for table `trx_sales_order_delivery_schedule`
+--
+ALTER TABLE `trx_sales_order_delivery_schedule`
+  ADD CONSTRAINT `FK6saenn5hcx525i504idif9qyr` FOREIGN KEY (`sales_order_id`) REFERENCES `trx_sales_order` (`id`);
 
 --
 -- Constraints for table `trx_sales_order_line`

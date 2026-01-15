@@ -13,10 +13,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.erp.sales.dto.SalesOrderDeliveryScheduleDto;
 import com.erp.sales.dto.SalesOrderDto;
 import com.erp.sales.dto.SalesOrderLineDto;
 import com.erp.sales.entity.SalesOrder;
+import com.erp.sales.entity.SalesOrderDeliverySchedule;
 import com.erp.sales.entity.SalesOrderLine;
+import com.erp.sales.model.SalesOrderType;
 import com.erp.sales.request.CreateSalesOrderRequest;
 import com.erp.sales.request.UpdateSalesOrderRequest;
 import com.erp.sales.service.SalesOrderService;
@@ -67,6 +70,18 @@ public class SalesOrderController {
         dto.setOrgId(so.getOrg() != null ? so.getOrg().getId() : null);
         dto.setBusinessPartnerId(so.getBusinessPartner() != null ? so.getBusinessPartner().getId() : null);
         dto.setPriceListVersionId(so.getPriceListVersion() != null ? so.getPriceListVersion().getId() : null);
+        dto.setOrderType(so.getOrderType() != null ? so.getOrderType() : SalesOrderType.DOMESTIC);
+        dto.setBuyerPo(so.getBuyerPo());
+        dto.setDepartmentId(so.getDepartment() != null ? so.getDepartment().getId() : null);
+        dto.setEmployeeId(so.getEmployee() != null ? so.getEmployee().getId() : null);
+        dto.setInCharge(so.getInCharge());
+        dto.setPaymentCondition(so.getPaymentCondition());
+        dto.setDeliveryPlace(so.getDeliveryPlace());
+        dto.setForwardingWarehouseId(so.getForwardingWarehouse() != null ? so.getForwardingWarehouse().getId() : null);
+        dto.setCurrencyId(so.getCurrency() != null ? so.getCurrency().getId() : null);
+        dto.setExchangeRate(so.getExchangeRate());
+        dto.setForeignAmount(so.getForeignAmount());
+        dto.setMemo(so.getMemo());
         dto.setDocumentNo(so.getDocumentNo());
         dto.setStatus(so.getStatus());
         dto.setOrderDate(so.getOrderDate());
@@ -74,6 +89,7 @@ public class SalesOrderController {
         dto.setTotalTax(so.getTotalTax());
         dto.setGrandTotal(so.getGrandTotal());
         dto.setLines(so.getLines() != null ? so.getLines().stream().map(this::toLineDto).toList() : List.of());
+        dto.setDeliverySchedules(so.getDeliverySchedules() != null ? so.getDeliverySchedules().stream().map(this::toScheduleDto).toList() : List.of());
         return dto;
     }
 
@@ -86,6 +102,39 @@ public class SalesOrderController {
         dto.setPrice(line.getPrice());
         dto.setLineNet(line.getLineNet());
         dto.setShippedQty(line.getShippedQty());
+        dto.setDescription(line.getDescription());
+        dto.setUnit(line.getUnit());
+        dto.setSize(line.getSize());
+        dto.setNationalSize(line.getNationalSize());
+        dto.setStyle(line.getStyle());
+        dto.setCuttingNo(line.getCuttingNo());
+        dto.setColor(line.getColor());
+        dto.setDestination(line.getDestination());
+        dto.setSupplyAmount(line.getSupplyAmount());
+        dto.setVatAmount(line.getVatAmount());
+        dto.setFobPrice(line.getFobPrice());
+        dto.setLdpPrice(line.getLdpPrice());
+        dto.setDpPrice(line.getDpPrice());
+        dto.setCmtCost(line.getCmtCost());
+        dto.setCmCost(line.getCmCost());
+        dto.setFabricEta(line.getFabricEta());
+        dto.setFabricEtd(line.getFabricEtd());
+        dto.setDeliveryDate(line.getDeliveryDate());
+        dto.setShipMode(line.getShipMode());
+        dto.setFactory(line.getFactory());
+        dto.setRemark(line.getRemark());
+        dto.setFilePath(line.getFilePath());
+        return dto;
+    }
+
+    private SalesOrderDeliveryScheduleDto toScheduleDto(SalesOrderDeliverySchedule sched) {
+        SalesOrderDeliveryScheduleDto dto = new SalesOrderDeliveryScheduleDto();
+        dto.setId(sched.getId());
+        dto.setDeliveryDate(sched.getDeliveryDate());
+        dto.setShipMode(sched.getShipMode());
+        dto.setFactory(sched.getFactory());
+        dto.setRemark(sched.getRemark());
+        dto.setFilePath(sched.getFilePath());
         return dto;
     }
 }

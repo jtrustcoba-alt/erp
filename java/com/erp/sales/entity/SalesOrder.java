@@ -9,8 +9,13 @@ import com.erp.core.entity.Company;
 import com.erp.core.entity.Org;
 import com.erp.core.model.BaseEntity;
 import com.erp.core.model.DocumentStatus;
+import com.erp.entity.Department;
+import com.erp.entity.Employee;
 import com.erp.masterdata.entity.BusinessPartner;
+import com.erp.masterdata.entity.Currency;
 import com.erp.masterdata.entity.PriceListVersion;
+import com.erp.masterdata.entity.Warehouse;
+import com.erp.sales.model.SalesOrderType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -43,6 +48,47 @@ public class SalesOrder extends BaseEntity {
     @JoinColumn(name = "price_list_version_id", nullable = false)
     private PriceListVersion priceListVersion;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_type", nullable = false)
+    private SalesOrderType orderType = SalesOrderType.DOMESTIC;
+
+    @Column(name = "buyer_po")
+    private String buyerPo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_id")
+    private Employee employee;
+
+    @Column(name = "in_charge")
+    private String inCharge;
+
+    @Column(name = "payment_condition")
+    private String paymentCondition;
+
+    @Column(name = "delivery_place")
+    private String deliveryPlace;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "forwarding_warehouse_id")
+    private Warehouse forwardingWarehouse;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "currency_id")
+    private Currency currency;
+
+    @Column(name = "exchange_rate")
+    private BigDecimal exchangeRate;
+
+    @Column(name = "foreign_amount")
+    private BigDecimal foreignAmount;
+
+    @Column(name = "memo")
+    private String memo;
+
     @Column(nullable = false, unique = true)
     private String documentNo;
 
@@ -64,6 +110,9 @@ public class SalesOrder extends BaseEntity {
 
     @OneToMany(mappedBy = "salesOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SalesOrderLine> lines = new ArrayList<>();
+
+    @OneToMany(mappedBy = "salesOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SalesOrderDeliverySchedule> deliverySchedules = new ArrayList<>();
 
     public Company getCompany() {
         return company;
@@ -95,6 +144,102 @@ public class SalesOrder extends BaseEntity {
 
     public void setPriceListVersion(PriceListVersion priceListVersion) {
         this.priceListVersion = priceListVersion;
+    }
+
+    public SalesOrderType getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(SalesOrderType orderType) {
+        this.orderType = orderType;
+    }
+
+    public String getBuyerPo() {
+        return buyerPo;
+    }
+
+    public void setBuyerPo(String buyerPo) {
+        this.buyerPo = buyerPo;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
+    public String getInCharge() {
+        return inCharge;
+    }
+
+    public void setInCharge(String inCharge) {
+        this.inCharge = inCharge;
+    }
+
+    public String getPaymentCondition() {
+        return paymentCondition;
+    }
+
+    public void setPaymentCondition(String paymentCondition) {
+        this.paymentCondition = paymentCondition;
+    }
+
+    public String getDeliveryPlace() {
+        return deliveryPlace;
+    }
+
+    public void setDeliveryPlace(String deliveryPlace) {
+        this.deliveryPlace = deliveryPlace;
+    }
+
+    public Warehouse getForwardingWarehouse() {
+        return forwardingWarehouse;
+    }
+
+    public void setForwardingWarehouse(Warehouse forwardingWarehouse) {
+        this.forwardingWarehouse = forwardingWarehouse;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    public BigDecimal getExchangeRate() {
+        return exchangeRate;
+    }
+
+    public void setExchangeRate(BigDecimal exchangeRate) {
+        this.exchangeRate = exchangeRate;
+    }
+
+    public BigDecimal getForeignAmount() {
+        return foreignAmount;
+    }
+
+    public void setForeignAmount(BigDecimal foreignAmount) {
+        this.foreignAmount = foreignAmount;
+    }
+
+    public String getMemo() {
+        return memo;
+    }
+
+    public void setMemo(String memo) {
+        this.memo = memo;
     }
 
     public String getDocumentNo() {
@@ -151,5 +296,13 @@ public class SalesOrder extends BaseEntity {
 
     public void setLines(List<SalesOrderLine> lines) {
         this.lines = lines;
+    }
+
+    public List<SalesOrderDeliverySchedule> getDeliverySchedules() {
+        return deliverySchedules;
+    }
+
+    public void setDeliverySchedules(List<SalesOrderDeliverySchedule> deliverySchedules) {
+        this.deliverySchedules = deliverySchedules;
     }
 }
