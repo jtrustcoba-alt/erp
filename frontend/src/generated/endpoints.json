@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-01-13T09:16:22.443Z",
+  "generatedAt": "2026-01-15T02:24:03.987Z",
   "controllers": [
     {
       "name": "AdminController",
-      "file": "src/main/java/com/erp/controller/AdminController.java",
+      "file": "java/com/erp/controller/AdminController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -39,7 +39,7 @@
     },
     {
       "name": "AttendanceController",
-      "file": "src/main/java/com/erp/controller/AttendanceController.java",
+      "file": "java/com/erp/controller/AttendanceController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -95,7 +95,7 @@
     },
     {
       "name": "AttendanceExportController",
-      "file": "src/main/java/com/erp/controller/AttendanceExportController.java",
+      "file": "java/com/erp/controller/AttendanceExportController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -111,7 +111,7 @@
     },
     {
       "name": "AuthController",
-      "file": "src/main/java/com/erp/controller/AuthController.java",
+      "file": "java/com/erp/controller/AuthController.java",
       "endpoints": [
         {
           "method": "POST",
@@ -127,7 +127,7 @@
     },
     {
       "name": "DepartmentController",
-      "file": "src/main/java/com/erp/controller/DepartmentController.java",
+      "file": "java/com/erp/controller/DepartmentController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -158,7 +158,7 @@
     },
     {
       "name": "EmailTestController",
-      "file": "src/main/java/com/erp/controller/EmailTestController.java",
+      "file": "java/com/erp/controller/EmailTestController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -169,7 +169,7 @@
     },
     {
       "name": "EmployeeController",
-      "file": "src/main/java/com/erp/controller/EmployeeController.java",
+      "file": "java/com/erp/controller/EmployeeController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -215,7 +215,7 @@
     },
     {
       "name": "EmployeeLeaveController",
-      "file": "src/main/java/com/erp/controller/EmployeeLeaveController.java",
+      "file": "java/com/erp/controller/EmployeeLeaveController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -246,7 +246,7 @@
     },
     {
       "name": "PerformanceReviewController",
-      "file": "src/main/java/com/erp/controller/PerformanceReviewController.java",
+      "file": "java/com/erp/controller/PerformanceReviewController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -277,7 +277,7 @@
     },
     {
       "name": "CoreCompanyController",
-      "file": "src/main/java/com/erp/core/controller/CoreCompanyController.java",
+      "file": "java/com/erp/core/controller/CoreCompanyController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -293,7 +293,7 @@
     },
     {
       "name": "CoreDocumentSequenceController",
-      "file": "src/main/java/com/erp/core/controller/CoreDocumentSequenceController.java",
+      "file": "java/com/erp/core/controller/CoreDocumentSequenceController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -309,7 +309,7 @@
     },
     {
       "name": "CoreOrgController",
-      "file": "src/main/java/com/erp/core/controller/CoreOrgController.java",
+      "file": "java/com/erp/core/controller/CoreOrgController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -325,7 +325,7 @@
     },
     {
       "name": "BankController",
-      "file": "src/main/java/com/erp/finance/controller/BankController.java",
+      "file": "java/com/erp/finance/controller/BankController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -366,7 +366,7 @@
     },
     {
       "name": "BudgetController",
-      "file": "src/main/java/com/erp/finance/controller/BudgetController.java",
+      "file": "java/com/erp/finance/controller/BudgetController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -402,7 +402,7 @@
     },
     {
       "name": "FinanceReportController",
-      "file": "src/main/java/com/erp/finance/controller/FinanceReportController.java",
+      "file": "java/com/erp/finance/controller/FinanceReportController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -433,7 +433,7 @@
     },
     {
       "name": "FiscalPeriodController",
-      "file": "src/main/java/com/erp/finance/controller/FiscalPeriodController.java",
+      "file": "java/com/erp/finance/controller/FiscalPeriodController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -474,7 +474,7 @@
     },
     {
       "name": "GlAccountController",
-      "file": "src/main/java/com/erp/finance/controller/GlAccountController.java",
+      "file": "java/com/erp/finance/controller/GlAccountController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -495,7 +495,7 @@
     },
     {
       "name": "InvoiceController",
-      "file": "src/main/java/com/erp/finance/controller/InvoiceController.java",
+      "file": "java/com/erp/finance/controller/InvoiceController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -516,7 +516,7 @@
     },
     {
       "name": "JournalEntryController",
-      "file": "src/main/java/com/erp/finance/controller/JournalEntryController.java",
+      "file": "java/com/erp/finance/controller/JournalEntryController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -527,7 +527,7 @@
     },
     {
       "name": "PaymentAllocationController",
-      "file": "src/main/java/com/erp/finance/controller/PaymentAllocationController.java",
+      "file": "java/com/erp/finance/controller/PaymentAllocationController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -543,7 +543,7 @@
     },
     {
       "name": "PaymentController",
-      "file": "src/main/java/com/erp/finance/controller/PaymentController.java",
+      "file": "java/com/erp/finance/controller/PaymentController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -564,7 +564,7 @@
     },
     {
       "name": "InventoryAdjustmentController",
-      "file": "src/main/java/com/erp/inventory/controller/InventoryAdjustmentController.java",
+      "file": "java/com/erp/inventory/controller/InventoryAdjustmentController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -585,12 +585,22 @@
           "method": "POST",
           "path": "/api/inventory/companies/{companyId}/adjustments",
           "handler": "create"
+        },
+        {
+          "method": "PUT",
+          "path": "/api/inventory/companies/{companyId}/adjustments/{adjustmentId}",
+          "handler": "update"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/inventory/companies/{companyId}/adjustments/{adjustmentId}",
+          "handler": "delete"
         }
       ]
     },
     {
       "name": "InventoryLocatorController",
-      "file": "src/main/java/com/erp/inventory/controller/InventoryLocatorController.java",
+      "file": "java/com/erp/inventory/controller/InventoryLocatorController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -606,7 +616,7 @@
     },
     {
       "name": "InventoryMovementController",
-      "file": "src/main/java/com/erp/inventory/controller/InventoryMovementController.java",
+      "file": "java/com/erp/inventory/controller/InventoryMovementController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -622,8 +632,13 @@
     },
     {
       "name": "InventoryOnHandController",
-      "file": "src/main/java/com/erp/inventory/controller/InventoryOnHandController.java",
+      "file": "java/com/erp/inventory/controller/InventoryOnHandController.java",
       "endpoints": [
+        {
+          "method": "GET",
+          "path": "/api/inventory/companies/{companyId}/onhand/by-locator",
+          "handler": "getOnHandByLocator"
+        },
         {
           "method": "GET",
           "path": "/api/inventory/companies/{companyId}/onhand",
@@ -633,7 +648,7 @@
     },
     {
       "name": "BomController",
-      "file": "src/main/java/com/erp/manufacturing/controller/BomController.java",
+      "file": "java/com/erp/manufacturing/controller/BomController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -664,7 +679,7 @@
     },
     {
       "name": "ManufacturingReportController",
-      "file": "src/main/java/com/erp/manufacturing/controller/ManufacturingReportController.java",
+      "file": "java/com/erp/manufacturing/controller/ManufacturingReportController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -680,7 +695,7 @@
     },
     {
       "name": "WorkOrderController",
-      "file": "src/main/java/com/erp/manufacturing/controller/WorkOrderController.java",
+      "file": "java/com/erp/manufacturing/controller/WorkOrderController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -721,7 +736,7 @@
     },
     {
       "name": "MasterDataBusinessPartnerController",
-      "file": "src/main/java/com/erp/masterdata/controller/MasterDataBusinessPartnerController.java",
+      "file": "java/com/erp/masterdata/controller/MasterDataBusinessPartnerController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -747,7 +762,7 @@
     },
     {
       "name": "MasterDataCurrencyController",
-      "file": "src/main/java/com/erp/masterdata/controller/MasterDataCurrencyController.java",
+      "file": "java/com/erp/masterdata/controller/MasterDataCurrencyController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -773,7 +788,7 @@
     },
     {
       "name": "MasterDataPriceListController",
-      "file": "src/main/java/com/erp/masterdata/controller/MasterDataPriceListController.java",
+      "file": "java/com/erp/masterdata/controller/MasterDataPriceListController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -799,7 +814,7 @@
     },
     {
       "name": "MasterDataPriceListVersionController",
-      "file": "src/main/java/com/erp/masterdata/controller/MasterDataPriceListVersionController.java",
+      "file": "java/com/erp/masterdata/controller/MasterDataPriceListVersionController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -815,7 +830,7 @@
     },
     {
       "name": "MasterDataProductController",
-      "file": "src/main/java/com/erp/masterdata/controller/MasterDataProductController.java",
+      "file": "java/com/erp/masterdata/controller/MasterDataProductController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -841,7 +856,7 @@
     },
     {
       "name": "MasterDataProductPriceController",
-      "file": "src/main/java/com/erp/masterdata/controller/MasterDataProductPriceController.java",
+      "file": "java/com/erp/masterdata/controller/MasterDataProductPriceController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -857,7 +872,7 @@
     },
     {
       "name": "MasterDataTaxRateController",
-      "file": "src/main/java/com/erp/masterdata/controller/MasterDataTaxRateController.java",
+      "file": "java/com/erp/masterdata/controller/MasterDataTaxRateController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -873,7 +888,7 @@
     },
     {
       "name": "MasterDataUomController",
-      "file": "src/main/java/com/erp/masterdata/controller/MasterDataUomController.java",
+      "file": "java/com/erp/masterdata/controller/MasterDataUomController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -899,7 +914,7 @@
     },
     {
       "name": "MasterDataWarehouseController",
-      "file": "src/main/java/com/erp/masterdata/controller/MasterDataWarehouseController.java",
+      "file": "java/com/erp/masterdata/controller/MasterDataWarehouseController.java",
       "endpoints": [
         {
           "method": "GET",
@@ -925,7 +940,7 @@
     },
     {
       "name": "GoodsReceiptController",
-      "file": "src/main/java/com/erp/purchase/controller/GoodsReceiptController.java",
+      "file": "java/com/erp/purchase/controller/GoodsReceiptController.java",
       "endpoints": [
         {
           "method": "POST",
@@ -936,12 +951,17 @@
     },
     {
       "name": "PurchaseOrderController",
-      "file": "src/main/java/com/erp/purchase/controller/PurchaseOrderController.java",
+      "file": "java/com/erp/purchase/controller/PurchaseOrderController.java",
       "endpoints": [
         {
           "method": "GET",
           "path": "/api/purchase/companies/{companyId}/purchase-orders",
           "handler": "list"
+        },
+        {
+          "method": "POST",
+          "path": "/api/purchase/companies/{companyId}/purchase-orders/{purchaseOrderId}/approve",
+          "handler": "approve"
         },
         {
           "method": "POST",
@@ -962,7 +982,7 @@
     },
     {
       "name": "GoodsShipmentController",
-      "file": "src/main/java/com/erp/sales/controller/GoodsShipmentController.java",
+      "file": "java/com/erp/sales/controller/GoodsShipmentController.java",
       "endpoints": [
         {
           "method": "POST",
@@ -973,7 +993,7 @@
     },
     {
       "name": "SalesOrderController",
-      "file": "src/main/java/com/erp/sales/controller/SalesOrderController.java",
+      "file": "java/com/erp/sales/controller/SalesOrderController.java",
       "endpoints": [
         {
           "method": "GET",

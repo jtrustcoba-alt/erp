@@ -15,4 +15,7 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
 
     @Query("select coalesce(sum(t.qty), 0) from StockTransaction t where t.locator.id = :locatorId and t.product.id = :productId")
     BigDecimal sumQtyByLocatorAndProduct(@Param("locatorId") Long locatorId, @Param("productId") Long productId);
+
+    @Query("select t.product.id, coalesce(sum(t.qty), 0) from StockTransaction t where t.company.id = :companyId and t.locator.id = :locatorId group by t.product.id")
+    List<Object[]> sumQtyByLocatorGroupedByProduct(@Param("companyId") Long companyId, @Param("locatorId") Long locatorId);
 }

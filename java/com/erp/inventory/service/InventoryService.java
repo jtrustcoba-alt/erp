@@ -24,6 +24,7 @@ import com.erp.inventory.repository.LocatorRepository;
 import com.erp.inventory.repository.StockTransactionRepository;
 import com.erp.inventory.request.CreateInventoryMovementRequest;
 import com.erp.inventory.request.CreateLocatorRequest;
+import com.erp.inventory.dto.OnHandByProductRow;
 import com.erp.masterdata.entity.Product;
 import com.erp.masterdata.entity.Warehouse;
 import com.erp.masterdata.repository.ProductRepository;
@@ -99,6 +100,17 @@ public class InventoryService {
 
     public BigDecimal getOnHandQty(Long locatorId, Long productId) {
         return stockTransactionRepository.sumQtyByLocatorAndProduct(locatorId, productId);
+    }
+
+    public List<OnHandByProductRow> getOnHandByLocator(Long companyId, Long locatorId) {
+        List<Object[]> rows = stockTransactionRepository.sumQtyByLocatorGroupedByProduct(companyId, locatorId);
+        List<OnHandByProductRow> out = new ArrayList<>();
+        for (Object[] r : rows) {
+            Long productId = (Long) r[0];
+            BigDecimal qty = (BigDecimal) r[1];
+            out.add(new OnHandByProductRow(locatorId, productId, qty));
+        }
+        return out;
     }
 
     @Transactional

@@ -77,6 +77,8 @@ export const inventoryApi = {
   createLocator: (companyId, payload) => http.post(`/api/inventory/companies/${companyId}/locators`, payload).then((r) => r.data),
 
   getOnHand: (companyId, params) => http.get(`/api/inventory/companies/${companyId}/onhand`, { params }).then((r) => r.data),
+  getOnHandByLocator: (companyId, params) =>
+    http.get(`/api/inventory/companies/${companyId}/onhand/by-locator`, { params }).then((r) => r.data),
 
   listMovements: (companyId) => http.get(`/api/inventory/companies/${companyId}/movements`).then((r) => r.data),
   createMovement: (companyId, payload) => http.post(`/api/inventory/companies/${companyId}/movements`, payload).then((r) => r.data),

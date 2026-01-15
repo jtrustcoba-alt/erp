@@ -3,7 +3,19 @@ import path from 'node:path'
 
 const root = path.resolve(process.cwd())
 const backendRoot = path.resolve(root, '..')
-const javaRoot = path.join(backendRoot, 'src', 'main', 'java')
+const javaRootCandidates = [
+  path.join(backendRoot, 'src', 'main', 'java'),
+  path.join(backendRoot, 'java')
+]
+
+function resolveJavaRoot() {
+  for (const p of javaRootCandidates) {
+    if (fs.existsSync(p)) return p
+  }
+  return null
+}
+
+const javaRoot = resolveJavaRoot()
 const outFile = path.join(root, 'src', 'generated', 'endpoints.json')
 
 function walk(dir) {
@@ -72,8 +84,9 @@ function normalizePath(a, b) {
 }
 
 function main() {
-  if (!fs.existsSync(javaRoot)) {
-    console.error('Java source folder not found:', javaRoot)
+  if (!javaRoot) {
+    console.error('Java source folder not found. Tried:')
+    for (const p of javaRootCandidates) console.error('-', p)
     process.exit(1)
   }
 
