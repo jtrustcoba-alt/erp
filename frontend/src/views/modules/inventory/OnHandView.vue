@@ -98,8 +98,8 @@ const form = reactive({
   productId: null
 })
 
-const isAllProducts = computed(() => form.productId === 0)
-const canCheck = computed(() => Boolean(ctx.companyId && form.locatorId && (form.productId || form.productId === 0)))
+const isAllProducts = computed(() => Number(form.productId) === 0)
+const canCheck = computed(() => Boolean(ctx.companyId && form.locatorId && (form.productId != null)))
 
 const selectedLocatorLabel = computed(() => {
   const l = (locators.value || []).find((x) => x.id === form.locatorId)
@@ -108,7 +108,7 @@ const selectedLocatorLabel = computed(() => {
 
 const selectedProductLabel = computed(() => {
   if (isAllProducts.value) return 'All'
-  const p = (products.value || []).find((x) => x.id === form.productId)
+  const p = (products.value || []).find((x) => x.id === Number(form.productId))
   return p ? `${p.code} - ${p.name}` : '-'
 })
 
